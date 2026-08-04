@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0a0a">
 <title>Notas de Voz — Bloco de Notas com Checklist</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icone-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Notas.Voz">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -1073,6 +1079,19 @@ if(!ReconhecimentoVoz){
   console.warn('Reconhecimento de voz indisponível neste navegador — o áudio ainda é gravado.');
 }
 desenhar();
+
+/* Funcionar sem internet: guarda a página para abrir offline.
+   Só roda em contexto seguro (https:// ou localhost) — abrir o arquivo direto não registra nada. */
+if('serviceWorker' in navigator && window.isSecureContext){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(() => {
+      if(!navigator.serviceWorker.controller && !localStorage.getItem('notasvoz.offline.avisado')){
+        localStorage.setItem('notasvoz.offline.avisado','1');
+        mostrarAviso('Pronto: esta página agora abre mesmo sem internet.','ok');
+      }
+    }).catch(e => console.warn('Service worker não registrado:', e));
+  });
+}
 </script>
 </body>
 </html>
