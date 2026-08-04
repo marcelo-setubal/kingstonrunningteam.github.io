@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>Despesas de Viagem — Limites 2026</title>
+<link rel="manifest" href="despesas.webmanifest">
+<link rel="icon" href="icone-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icone-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Despesas">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --preto:#0a0a0a;
+  --preto-2:#121212;
+  --preto-3:#1a1a1a;
+  --borda:#2a2a2a;
+  --branco:#ffffff;
+  --cinza:#9a9a9a;
+  --cinza-2:#6a6a6a;
+  --vermelho:#e10600;
+  --vermelho-claro:#ff3b30;
+  --verde:#25c26e;
+  --ambar:#ffb020;
+  --azul:#3b82f6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--preto);
+  color:var(--branco);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(96px + env(safe-area-inset-bottom));
+}
+.container{width:100%;max-width:960px;margin:0 auto;padding:0 16px}
+
+/* ---------- Cabeçalho ---------- */
+header{
+  border-bottom:1px solid var(--borda);
+  background:linear-gradient(180deg,#141414 0%,var(--preto) 100%);
+  position:sticky;top:0;z-index:40;
+  backdrop-filter:blur(8px);
+  padding-top:env(safe-area-inset-top);
+}
+.topo{display:flex;align-items:center;gap:12px;padding:14px 0}
+.marca{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.marca .bolha{
+  width:42px;height:42px;border-radius:12px;flex:none;
+  background:var(--vermelho);
+  display:grid;place-items:center;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 8px 20px rgba(225,6,0,.35);
+}
+.marca .bolha svg{width:22px;height:22px;fill:#fff}
+.marca h1{
+  font-family:'Anton',sans-serif;font-weight:400;
+  font-size:1.4rem;letter-spacing:.06em;text-transform:uppercase;
+  margin:0;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.marca h1 span{color:var(--vermelho)}
+.marca p{margin:2px 0 0;font-size:.72rem;color:var(--cinza);letter-spacing:.02em}
+.btn-icone{
+  width:40px;height:40px;flex:none;border-radius:10px;
+  background:var(--preto-3);border:1px solid var(--borda);color:var(--branco);
+  display:grid;place-items:center;cursor:pointer;transition:.15s;
+}
+.btn-icone:hover{border-color:var(--vermelho);color:var(--vermelho)}
+.btn-icone svg{width:18px;height:18px;fill:currentColor}
+
+/* ---------- Botões ---------- */
+.btn{
+  border:1px solid var(--borda);background:var(--preto-3);color:var(--branco);
+  padding:10px 16px;border-radius:10px;font:inherit;font-weight:600;font-size:.875rem;
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.15s;
+}
+.btn:hover:not(:disabled){border-color:#4a4a4a;background:#232323}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:16px;height:16px;fill:currentColor}
+.btn.primario{background:var(--vermelho);border-color:var(--vermelho);color:#fff}
+.btn.primario:hover:not(:disabled){background:#ff1a12;border-color:#ff1a12}
+.btn.fantasma{background:transparent}
+.btn.perigo{color:var(--vermelho-claro);border-color:#3a1a1a}
+.btn.pequeno{padding:7px 12px;font-size:.8rem;border-radius:9px}
+.btn.largo{width:100%}
+
+/* ---------- Resumo ---------- */
+.resumo{
+  margin-top:16px;display:grid;gap:10px;
+  grid-template-columns:repeat(2,1fr);
+}
+@media(min-width:640px){ .resumo{grid-template-columns:repeat(4,1fr)} }
+.cartao{
+  background:var(--preto-2);border:1px solid var(--borda);border-radius:14px;padding:12px 14px;
+}
+.cartao .rotulo{font-size:.7rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em}
+.cartao .valor{font-size:1.35rem;font-weight:700;margin-top:2px;line-height:1.2}
+.cartao .sub{font-size:.72rem;color:var(--cinza-2);margin-top:2px}
+.cartao.alerta{border-color:#4a1f1f;background:#1a1010}
+.cartao.alerta .valor{color:var(--vermelho-claro)}
+.cartao.aviso{border-color:#4a3a12}
+.cartao.aviso .valor{color:var(--ambar)}
+
+/* ---------- Captura ---------- */
+.captura{
+  margin-top:16px;background:var(--preto-2);
+  border:1px solid var(--borda);border-radius:16px;padding:16px;
+}
+.captura h2{margin:0 0 4px;font-size:1rem}
+.captura p.dica{margin:0 0 14px;font-size:.8rem;color:var(--cinza)}
+.acoes-captura{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-foto{
+  border:1px dashed #3a3a3a;background:var(--preto-3);color:var(--branco);
+  border-radius:14px;padding:18px 12px;font:inherit;font-weight:600;font-size:.9rem;
+  display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:.15s;
+}
+.btn-foto:hover{border-color:var(--vermelho);color:#fff;background:#221515}
+.btn-foto svg{width:26px;height:26px;fill:var(--vermelho)}
+.btn-foto small{font-weight:400;font-size:.7rem;color:var(--cinza)}
+input[type=file]{display:none}
+
+/* ---------- Formulário ---------- */
+.campo{margin-top:12px}
+.campo label{display:block;font-size:.74rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.campo input, .campo select, .campo textarea{
+  width:100%;background:var(--preto-3);border:1px solid var(--borda);border-radius:10px;
+  padding:11px 12px;color:var(--branco);font:inherit;font-size:.95rem;outline:0;
+}
+.campo input:focus, .campo select:focus, .campo textarea:focus{border-color:var(--vermelho)}
+.campo textarea{min-height:70px;resize:vertical}
+.linha{display:grid;gap:10px}
+.linha.duas{grid-template-columns:1fr 1fr}
+.linha.tres{grid-template-columns:1.4fr 1fr 1fr}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  border:1px solid var(--borda);background:var(--preto-3);color:var(--cinza);
+  border-radius:999px;padding:9px 14px;font:inherit;font-size:.84rem;font-weight:600;cursor:pointer;transition:.15s;
+}
+.chip:hover{color:#fff;border-color:#4a4a4a}
+.chip.ativo{background:var(--vermelho);border-color:var(--vermelho);color:#fff}
+.chip small{display:block;font-weight:400;font-size:.68rem;opacity:.8}
+.interruptor{display:inline-flex;align-items:center;gap:9px;font-size:.85rem;color:var(--branco);cursor:pointer;user-select:none;padding:6px 0}
+.interruptor input{display:none}
+.interruptor .trilho{width:38px;height:22px;border-radius:11px;background:#333;position:relative;transition:.2s;flex:none}
+.interruptor .trilho::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#888;transition:.2s}
+.interruptor input:checked + .trilho{background:var(--vermelho)}
+.interruptor input:checked + .trilho::after{left:19px;background:#fff}
+
+/* ---------- Veredito ---------- */
+.veredito{margin-top:14px;border-radius:12px;padding:12px 14px;border:1px solid var(--borda);background:var(--preto-3);font-size:.88rem}
+.veredito.ok{border-color:#14512f;background:#0d1a13}
+.veredito.atencao{border-color:#4a3a12;background:#1a160c}
+.veredito.violacao{border-color:#4a1f1f;background:#1a1010}
+.veredito .cabeca{display:flex;align-items:center;gap:8px;font-weight:700}
+.veredito.ok .cabeca{color:var(--verde)}
+.veredito.atencao .cabeca{color:var(--ambar)}
+.veredito.violacao .cabeca{color:var(--vermelho-claro)}
+.veredito ul{margin:8px 0 0;padding-left:18px;color:var(--cinza)}
+.veredito li{margin:3px 0}
+.barra{height:6px;border-radius:3px;background:#2a2a2a;overflow:hidden;margin-top:10px}
+.barra i{display:block;height:100%;background:var(--verde);transition:width .3s}
+.barra i.atencao{background:var(--ambar)}
+.barra i.violacao{background:var(--vermelho-claro)}
+
+/* ---------- Lista ---------- */
+.secao-titulo{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:26px 0 10px;
+}
+.secao-titulo h2{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.05em;text-transform:uppercase;font-size:1.05rem;margin:0}
+.filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.filtro{
+  border:1px solid var(--borda);background:transparent;color:var(--cinza);
+  border-radius:999px;padding:6px 12px;font:inherit;font-size:.78rem;cursor:pointer;
+}
+.filtro.ativo{background:#232323;color:#fff;border-color:#4a4a4a}
+.dia{margin-top:18px}
+.dia > h3{
+  font-size:.76rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.08em;
+  margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+}
+.dia > h3 b{color:var(--branco);font-weight:600;letter-spacing:0;text-transform:none;font-size:.85rem}
+.despesa{
+  display:flex;gap:12px;align-items:center;
+  background:var(--preto-2);border:1px solid var(--borda);border-radius:14px;
+  padding:10px;margin-bottom:8px;cursor:pointer;transition:.15s;
+}
+.despesa:hover{border-color:#4a4a4a}
+.despesa.violacao{border-left:3px solid var(--vermelho-claro)}
+.despesa.atencao{border-left:3px solid var(--ambar)}
+.despesa.ok{border-left:3px solid var(--verde)}
+.miniatura{
+  width:54px;height:54px;border-radius:10px;flex:none;object-fit:cover;
+  background:var(--preto-3);border:1px solid var(--borda);
+  display:grid;place-items:center;color:var(--cinza-2);font-size:.65rem;
+}
+.despesa .info{flex:1;min-width:0}
+.despesa .info .t{font-weight:600;font-size:.92rem;display:flex;align-items:center;gap:6px}
+.despesa .info .t .nome{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.despesa .info .s{font-size:.75rem;color:var(--cinza);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.despesa .dir{text-align:right;flex:none}
+.despesa .dir .v{font-weight:700;font-size:.95rem}
+.despesa .dir .m{font-size:.7rem;color:var(--cinza)}
+.etiqueta{flex:none;display:inline-block;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;border-radius:5px;vertical-align:middle}
+.etiqueta.violacao{background:#3a1212;color:var(--vermelho-claro)}
+.etiqueta.atencao{background:#3a2f0e;color:var(--ambar)}
+.etiqueta.ok{background:#0f2e1c;color:var(--verde)}
+.etiqueta.neutra{background:#232323;color:var(--cinza)}
+.vazio{text-align:center;color:var(--cinza-2);padding:40px 16px;font-size:.9rem}
+
+/* ---------- Avisos ---------- */
+#aviso{
+  position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:60;
+  max-width:600px;margin:0 auto;border-radius:12px;padding:12px 14px;font-size:.85rem;
+  background:var(--preto-3);border:1px solid var(--borda);display:none;box-shadow:0 10px 30px rgba(0,0,0,.6);
+}
+#aviso.mostrando{display:block}
+#aviso.ok{border-color:#14512f;color:#7ee0a8}
+#aviso.erro{border-color:#4a1f1f;color:#ff8a80}
+#aviso.info{border-color:#1e3a5f;color:#9ec9ff}
+
+/* ---------- Barra inferior ---------- */
+.barra-inferior{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:rgba(10,10,10,.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--borda);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+}
+.barra-inferior .container{display:flex;gap:10px}
+
+/* ---------- Modais ---------- */
+.fundo-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:80;
+  display:none;align-items:flex-end;justify-content:center;
+}
+.fundo-modal.aberto{display:flex}
+@media(min-width:640px){ .fundo-modal{align-items:center} }
+.modal{
+  background:var(--preto-2);border:1px solid var(--borda);
+  border-radius:18px 18px 0 0;width:100%;max-width:640px;
+  max-height:92vh;overflow-y:auto;padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+}
+@media(min-width:640px){ .modal{border-radius:18px;max-height:88vh} }
+.modal .cabecalho{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.modal h2{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.05em;text-transform:uppercase;font-size:1.1rem;margin:0}
+.modal .fechar{background:none;border:0;color:var(--cinza);font-size:1.6rem;line-height:1;cursor:pointer;padding:0 4px}
+.modal .explicacao{font-size:.8rem;color:var(--cinza);margin:0 0 12px}
+.divisor{height:1px;background:var(--borda);margin:18px 0}
+
+/* Lançamento no site da empresa */
+.linha-copia{
+  display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #1e1e1e;
+}
+.linha-copia .rot{font-size:.72rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;width:104px;flex:none}
+.linha-copia .val{flex:1;min-width:0;font-size:.9rem;font-weight:600;word-break:break-word}
+.linha-copia button{
+  flex:none;border:1px solid var(--borda);background:var(--preto-3);color:var(--cinza);
+  border-radius:8px;padding:6px 10px;font:inherit;font-size:.72rem;cursor:pointer;
+}
+.linha-copia button:hover{color:#fff;border-color:#4a4a4a}
+
+.tabela-politica{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:8px}
+.tabela-politica th,.tabela-politica td{padding:7px 8px;border-bottom:1px solid var(--borda);text-align:left}
+.tabela-politica th{font-size:.7rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.tabela-politica td b{color:var(--verde)}
+.nota{font-size:.78rem;color:var(--cinza);background:var(--preto-3);border:1px solid var(--borda);border-radius:10px;padding:10px 12px;margin-top:10px}
+.nota b{color:var(--branco)}
+img.previa{width:100%;border-radius:12px;border:1px solid var(--borda);margin-top:10px;display:block}
+.girando{animation:girar 1s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container topo">
+    <div class="marca">
+      <div class="bolha">
+        <svg viewBox="0 0 24 24"><path d="M9 2h6a1 1 0 0 1 1 1v1h3a2 2 0 0 1 2 2v13a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a2 2 0 0 1 2-2h3V3a1 1 0 0 1 1-1zm-2 7a1 1 0 0 0 0 2h10a1 1 0 1 0 0-2H7zm0 4a1 1 0 1 0 0 2h10a1 1 0 1 0 0-2H7zm0 4a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H7z"/></svg>
+      </div>
+      <div style="min-width:0">
+        <h1>Des<span>pesas</span></h1>
+        <p id="subtituloViagem">Limites 2026 · viagem internacional</p>
+      </div>
+    </div>
+    <button class="btn-icone" id="btnPolitica" title="Política de limites">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+    </button>
+    <button class="btn-icone" id="btnConfig" title="Configurações">
+      <svg viewBox="0 0 24 24"><path d="M19.4 13a7.7 7.7 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.4h-4l-.3 2.6a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.7 7.7 0 0 0 0 2l-2 1.6 2 3.4 2.4-1c.5.4 1.1.8 1.7 1l.3 2.6h4l.3-2.6c.6-.2 1.2-.6 1.7-1l2.4 1 2-3.4-2-1.6zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Resumo -->
+  <div class="resumo" id="resumo"></div>
+
+  <!-- Captura -->
+  <section class="captura">
+    <h2>Nova despesa</h2>
+    <p class="dica">Fotografe o comprovante. A IA lê o valor, a data e o estabelecimento; você só confirma o tipo de refeição.</p>
+    <div class="acoes-captura">
+      <button class="btn-foto" id="btnCamera">
+        <svg viewBox="0 0 24 24"><path d="M9 3l-1.5 2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.5L15 3H9zm3 5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm0 2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/></svg>
+        Fotografar
+        <small>abre a câmera</small>
+      </button>
+      <button class="btn-foto" id="btnArquivo">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+        Da galeria
+        <small>foto ou PDF</small>
+      </button>
+    </div>
+    <input type="file" id="entradaCamera" accept="image/*" capture="environment">
+    <input type="file" id="entradaArquivo" accept="image/*,application/pdf">
+    <button class="btn fantasma largo" id="btnManual" style="margin-top:10px">Lançar sem comprovante (digitar à mão)</button>
+  </section>
+
+  <!-- Lista -->
+  <div class="secao-titulo">
+    <h2>Despesas</h2>
+    <button class="btn pequeno fantasma" id="btnExportar">
+      <svg viewBox="0 0 24 24"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 17.4l-4.7-5.7 1.4-1.4L12 13.6V3h0zM5 19h14v2H5z"/></svg>
+      Exportar
+    </button>
+  </div>
+  <div class="filtros" id="filtros">
+    <button class="filtro ativo" data-filtro="todas">Todas</button>
+    <button class="filtro" data-filtro="fora">Fora da política</button>
+    <button class="filtro" data-filtro="atencao">Com pendência</button>
+    <button class="filtro" data-filtro="alancar">A lançar no sistema</button>
+    <button class="filtro" data-filtro="refeicoes">Só refeições</button>
+  </div>
+  <div id="lista"></div>
+
+</main>
+
+<div class="barra-inferior">
+  <div class="container">
+    <button class="btn primario largo" id="btnCameraRodape">
+      <svg viewBox="0 0 24 24"><path d="M9 3l-1.5 2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.5L15 3H9zm3 5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm0 2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/></svg>
+      Fotografar comprovante
+    </button>
+  </div>
+</div>
+
+<div id="aviso"></div>
+
+<!-- ============ MODAL: DESPESA ============ -->
+<div class="fundo-modal" id="modalDespesa">
+  <div class="modal">
+    <div class="cabecalho">
+      <h2 id="tituloDespesa">Nova despesa</h2>
+      <button class="fechar" data-fechar>&times;</button>
+    </div>
+
+    <div id="areaComprovante"></div>
+
+    <div id="areaLeitura" style="margin-top:10px"></div>
+
+    <div class="campo">
+      <label>Tipo de despesa</label>
+      <div class="chips" id="chipsCategoria"></div>
+    </div>
+
+    <div class="linha tres" style="margin-top:12px">
+      <div class="campo" style="margin:0">
+        <label>Valor</label>
+        <input type="text" inputmode="decimal" id="cValor" placeholder="0,00">
+      </div>
+      <div class="campo" style="margin:0">
+        <label>Moeda</label>
+        <select id="cMoeda">
+          <option value="USD">US$ (dólar)</option>
+          <option value="BRL">R$ (real)</option>
+        </select>
+      </div>
+      <div class="campo" style="margin:0">
+        <label>Cotação</label>
+        <input type="text" inputmode="decimal" id="cTaxa" placeholder="5,40">
+      </div>
+    </div>
+
+    <div class="linha duas" style="margin-top:12px">
+      <div class="campo" style="margin:0">
+        <label>Data</label>
+        <input type="date" id="cData">
+      </div>
+      <div class="campo" style="margin:0">
+        <label>Hora</label>
+        <input type="time" id="cHora">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label>Estabelecimento</label>
+      <input type="text" id="cEstabelecimento" placeholder="Nome do restaurante / hotel">
+    </div>
+
+    <div class="linha duas">
+      <div class="campo" style="margin:0">
+        <label>Cidade</label>
+        <input type="text" id="cCidade" placeholder="Cidade">
+      </div>
+      <div class="campo" style="margin:0">
+        <label>País</label>
+        <input type="text" id="cPais" placeholder="País">
+      </div>
+    </div>
+
+    <div class="linha duas">
+      <div class="campo" style="margin:0">
+        <label>Nº de requisição de viagem</label>
+        <input type="text" id="cRequisicao" placeholder="obrigatório para hotéis">
+      </div>
+      <div class="campo" style="margin:0">
+        <label>Pessoas na refeição</label>
+        <input type="number" min="1" step="1" id="cPessoas" value="1">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label>Forma de pagamento</label>
+      <input type="text" id="cPagamento" placeholder="Cartão corporativo, pessoal, dinheiro…">
+    </div>
+
+    <div style="margin-top:8px;display:flex;flex-direction:column;gap:2px">
+      <label class="interruptor"><input type="checkbox" id="cAlcool"><span class="trilho"></span> A conta inclui bebida alcoólica</label>
+      <label class="interruptor"><input type="checkbox" id="cGestor"><span class="trilho"></span> Sou o gestor mais sênior presente</label>
+    </div>
+
+    <div class="campo">
+      <label>Observação</label>
+      <textarea id="cObservacao" placeholder="Participantes, motivo, o que foi consumido…"></textarea>
+    </div>
+
+    <div id="vereditoDespesa"></div>
+
+    <div id="areaLancamento"></div>
+
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn perigo" id="btnExcluir" style="display:none">Excluir</button>
+      <button class="btn primario" id="btnSalvar" style="flex:1">Salvar despesa</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: CONFIGURAÇÕES ============ -->
+<div class="fundo-modal" id="modalConfig">
+  <div class="modal">
+    <div class="cabecalho">
+      <h2>Configurações</h2>
+      <button class="fechar" data-fechar>&times;</button>
+    </div>
+
+    <p class="explicacao">Tudo fica guardado <b>somente neste aparelho</b>. Nada é enviado para servidor nenhum, exceto a foto do comprovante quando você pede a leitura automática — essa vai só para <code>api.anthropic.com</code>.</p>
+
+    <h3 style="font-size:.9rem;margin:16px 0 0">Limites por refeição</h3>
+    <div class="linha tres" style="margin-top:8px">
+      <div class="campo" style="margin:0">
+        <label>Café da manhã</label>
+        <input type="text" inputmode="decimal" id="fLimiteCafe">
+      </div>
+      <div class="campo" style="margin:0">
+        <label>Almoço</label>
+        <input type="text" inputmode="decimal" id="fLimiteAlmoco">
+      </div>
+      <div class="campo" style="margin:0">
+        <label>Jantar</label>
+        <input type="text" inputmode="decimal" id="fLimiteJantar">
+      </div>
+    </div>
+    <p class="explicacao" style="margin-top:6px">Valores em dólar (US$), conforme a política de 5 de janeiro de 2026.</p>
+
+    <div class="divisor"></div>
+
+    <h3 style="font-size:.9rem;margin:0">Câmbio</h3>
+    <div class="linha duas" style="margin-top:8px">
+      <div class="campo" style="margin:0">
+        <label>R$ por US$ 1,00</label>
+        <input type="text" inputmode="decimal" id="fTaxa">
+      </div>
+      <div class="campo" style="margin:0">
+        <label>&nbsp;</label>
+        <button class="btn largo" id="btnCotacao">Buscar cotação do dia</button>
+      </div>
+    </div>
+    <p class="explicacao" style="margin-top:6px" id="infoCotacao">Usada para comparar despesas em real com os limites em dólar. Funciona offline: o valor digitado aqui é o padrão de toda despesa nova.</p>
+
+    <div class="divisor"></div>
+
+    <h3 style="font-size:.9rem;margin:0">Viagem</h3>
+    <div class="linha duas" style="margin-top:8px">
+      <div class="campo" style="margin:0">
+        <label>Nº de requisição padrão</label>
+        <input type="text" id="fRequisicao" placeholder="preenche sozinho nas novas despesas">
+      </div>
+      <div class="campo" style="margin:0">
+        <label>Destino / descrição</label>
+        <input type="text" id="fViagem" placeholder="Ex.: Chicago, jan/2026">
+      </div>
+    </div>
+    <label class="interruptor" style="margin-top:8px"><input type="checkbox" id="fExigirRequisicao"><span class="trilho"></span> Exigir nº de requisição em hotéis</label>
+
+    <div class="divisor"></div>
+
+    <h3 style="font-size:.9rem;margin:0">Leitura automática (IA)</h3>
+    <div class="campo">
+      <label>Chave da API Anthropic</label>
+      <input type="password" id="fChave" placeholder="sk-ant-…" autocomplete="off">
+    </div>
+    <div class="campo">
+      <label>Modelo</label>
+      <select id="fModelo">
+        <option value="claude-opus-5">Claude Opus 5 — leitura mais precisa</option>
+        <option value="claude-sonnet-5">Claude Sonnet 5 — equilíbrio</option>
+        <option value="claude-haiku-4-5">Claude Haiku 4.5 — mais barato e rápido</option>
+      </select>
+    </div>
+    <label class="interruptor" style="margin-top:8px"><input type="checkbox" id="fLerAuto"><span class="trilho"></span> Ler o comprovante assim que eu tirar a foto</label>
+    <p class="explicacao" style="margin-top:8px">Sem chave, o app continua funcionando: você digita os dados e ele faz toda a conferência de limites, o arquivo do comprovante e a exportação.</p>
+
+    <div class="divisor"></div>
+
+    <h3 style="font-size:.9rem;margin:0">Dados</h3>
+    <p class="explicacao" style="margin-top:6px" id="infoArmazenamento"></p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="btnImportar">Restaurar backup (.json)</button>
+      <button class="btn perigo" id="btnApagarTudo">Apagar tudo</button>
+    </div>
+    <input type="file" id="entradaImportar" accept="application/json,.json">
+
+    <button class="btn primario largo" id="btnSalvarConfig" style="margin-top:18px">Salvar configurações</button>
+  </div>
+</div>
+
+<!-- ============ MODAL: POLÍTICA ============ -->
+<div class="fundo-modal" id="modalPolitica">
+  <div class="modal">
+    <div class="cabecalho">
+      <h2>Política 2026</h2>
+      <button class="fechar" data-fechar>&times;</button>
+    </div>
+    <p class="explicacao">Em vigor desde 5 de janeiro de 2026.</p>
+    <table class="tabela-politica">
+      <thead><tr><th>Refeição</th><th>Antes</th><th>Novo limite</th></tr></thead>
+      <tbody id="corpoPolitica"></tbody>
+    </table>
+    <div class="nota"><b>Sem exceções</b> aos limites, mesmo com aprovação do gestor.</div>
+    <div class="nota"><b>Álcool não pode ser reembolsado no café da manhã.</b> No almoço e no jantar, a bebida entra na conta e o total precisa continuar dentro do limite. Sem exceções.</div>
+    <div class="nota">Toda refeição deve ser <b>paga e lançada pelo gestor mais sênior presente</b>. Sem exceções.</div>
+    <div class="nota">O <b>nº de requisição de viagem é obrigatório</b> para hotéis.</div>
+    <p class="explicacao" style="margin-top:14px">Os limites usados na conferência são os que estão em Configurações — ajuste lá se a empresa mudar os valores.</p>
+  </div>
+</div>
+
+<!-- ============ MODAL: EXPORTAR ============ -->
+<div class="fundo-modal" id="modalExportar">
+  <div class="modal">
+    <div class="cabecalho">
+      <h2>Exportar</h2>
+      <button class="fechar" data-fechar>&times;</button>
+    </div>
+    <p class="explicacao">Para prestar contas no site da empresa e guardar os comprovantes.</p>
+
+    <button class="btn largo" id="btnZip" style="margin-bottom:10px">
+      Pacote completo (.zip) — planilha + comprovantes
+    </button>
+    <button class="btn largo" id="btnCsv" style="margin-bottom:10px">
+      Planilha de despesas (.csv)
+    </button>
+    <button class="btn largo" id="btnJson" style="margin-bottom:10px">
+      Backup dos dados (.json)
+    </button>
+    <div class="nota">O .zip traz <b>despesas.csv</b> (abre no Excel), <b>despesas.json</b> (backup) e a pasta <b>comprovantes/</b> com cada foto nomeada pela data, tipo e valor — na mesma ordem da planilha.</div>
+    <div class="divisor"></div>
+    <h3 style="font-size:.9rem;margin:0 0 8px">Roteiro de digitação</h3>
+    <p class="explicacao">Lista enxuta, na ordem, para digitar no sistema da empresa. Cada despesa que você marcar como lançada some daqui.</p>
+    <button class="btn largo" id="btnRoteiro">Abrir roteiro de lançamento</button>
+  </div>
+</div>
+
+<!-- ============ MODAL: ROTEIRO ============ -->
+<div class="fundo-modal" id="modalRoteiro">
+  <div class="modal">
+    <div class="cabecalho">
+      <h2>Roteiro de lançamento</h2>
+      <button class="fechar" data-fechar>&times;</button>
+    </div>
+    <div id="corpoRoteiro"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   BASE
+   ========================================================================= */
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+const CHAVE_DESPESAS = 'despesas.itens.v1';
+const CHAVE_CONFIG   = 'despesas.config.v1';
+
+const CATEGORIAS = [
+  { id:'cafe',       nome:'Café da manhã', refeicao:true,  icone:'☕' },
+  { id:'almoco',     nome:'Almoço',        refeicao:true,  icone:'🍽️' },
+  { id:'jantar',     nome:'Jantar',        refeicao:true,  icone:'🌙' },
+  { id:'hotel',      nome:'Hotel',         refeicao:false, icone:'🏨' },
+  { id:'transporte', nome:'Transporte',    refeicao:false, icone:'🚕' },
+  { id:'aereo',      nome:'Passagem',      refeicao:false, icone:'✈️' },
+  { id:'bagagem',    nome:'Bagagem',       refeicao:false, icone:'🧳' },
+  { id:'outro',      nome:'Outro',         refeicao:false, icone:'🧾' }
+];
+const catPorId = id => CATEGORIAS.find(c => c.id === id) || CATEGORIAS[CATEGORIAS.length - 1];
+
+/* Limites publicados pela empresa (e o que valia antes, só para referência na tela). */
+const LIMITES_ANTERIORES = { cafe:20, almoco:30, jantar:50 };
+
+/* =========================================================================
+   CONFIGURAÇÃO
+   ========================================================================= */
+const CONFIG_PADRAO = {
+  limites:{ cafe:25, almoco:40, jantar:65 },
+  taxa: 5.40,
+  chaveApi:'',
+  modelo:'claude-opus-5',
+  lerAuto:true,
+  requisicao:'',
+  viagem:'',
+  exigirRequisicao:true
+};
+
+function carregarConfig(){
+  const salvo = (() => {
+    try{ return JSON.parse(localStorage.getItem(CHAVE_CONFIG) || '{}'); }
+    catch(e){ return {}; }
+  })();
+  const c = Object.assign({}, CONFIG_PADRAO, salvo);
+  c.limites = Object.assign({}, CONFIG_PADRAO.limites, salvo.limites || {});
+  // Reaproveita a chave do app de notas, se ela já estiver neste navegador.
+  if(!c.chaveApi){
+    try{
+      const notas = JSON.parse(localStorage.getItem('notasvoz.config.v1') || '{}');
+      if(notas.chaveApi) c.chaveApi = notas.chaveApi;
+    }catch(e){}
+  }
+  return c;
+}
+function salvarConfig(){
+  localStorage.setItem(CHAVE_CONFIG, JSON.stringify(config));
+}
+let config = carregarConfig();
+
+/* =========================================================================
+   DESPESAS (localStorage) — as fotos ficam no IndexedDB, ver abaixo
+   ========================================================================= */
+function carregarDespesas(){
+  try{
+    const bruto = JSON.parse(localStorage.getItem(CHAVE_DESPESAS) || '[]');
+    return Array.isArray(bruto) ? bruto.map(normalizarDespesa) : [];
+  }catch(e){ return []; }
+}
+function salvarDespesas(){
+  try{
+    localStorage.setItem(CHAVE_DESPESAS, JSON.stringify(despesas));
+  }catch(e){
+    mostrarAviso('Não consegui salvar: o armazenamento do navegador está cheio. Exporte o pacote .zip e apague despesas antigas.','erro');
+  }
+}
+function normalizarDespesa(d){
+  return {
+    id: d.id || novoId(),
+    criadoEm: d.criadoEm || Date.now(),
+    data: d.data || hojeISO(),
+    hora: d.hora || '',
+    categoria: catPorId(d.categoria).id,
+    valor: Number(d.valor) || 0,
+    moeda: d.moeda === 'BRL' ? 'BRL' : 'USD',
+    taxa: Number(d.taxa) || config.taxa,
+    estabelecimento: d.estabelecimento || '',
+    cidade: d.cidade || '',
+    pais: d.pais || '',
+    requisicao: d.requisicao || '',
+    pessoas: Math.max(1, parseInt(d.pessoas, 10) || 1),
+    pagamento: d.pagamento || '',
+    alcool: !!d.alcool,
+    gestorSenior: d.gestorSenior !== false,
+    observacao: d.observacao || '',
+    lancado: !!d.lancado,
+    temComprovante: !!d.temComprovante,
+    tipoComprovante: d.tipoComprovante || '',
+    lidoPorIA: !!d.lidoPorIA
+  };
+}
+let despesas = carregarDespesas();
+
+const novoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const hojeISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+const agoraHM = () => {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+};
+
+/* =========================================================================
+   ARQUIVOS DOS COMPROVANTES (IndexedDB)
+   ========================================================================= */
+const BD = (() => {
+  let promessa = null;
+  function abrir(){
+    if(promessa) return promessa;
+    promessa = new Promise((ok, falha) => {
+      if(!('indexedDB' in window)) return falha(new Error('sem indexedDB'));
+      const req = indexedDB.open('despesas', 1);
+      req.onupgradeneeded = () => {
+        const bd = req.result;
+        if(!bd.objectStoreNames.contains('comprovantes')) bd.createObjectStore('comprovantes');
+      };
+      req.onsuccess = () => ok(req.result);
+      req.onerror   = () => falha(req.error);
+    });
+    return promessa;
+  }
+  async function operar(modo, fn){
+    const bd = await abrir();
+    return new Promise((ok, falha) => {
+      const t = bd.transaction('comprovantes', modo);
+      const p = fn(t.objectStore('comprovantes'));
+      t.oncomplete = () => ok(p && p.result !== undefined ? p.result : undefined);
+      t.onerror    = () => falha(t.error);
+      t.onabort    = () => falha(t.error);
+    });
+  }
+  return {
+    guardar: (chave, blob) => operar('readwrite', loja => loja.put(blob, chave)),
+    ler:     chave => operar('readonly',  loja => loja.get(chave)),
+    apagar:  chave => operar('readwrite', loja => loja.delete(chave)),
+    chaves:  ()    => operar('readonly',  loja => loja.getAllKeys()),
+    limpar:  ()    => operar('readwrite', loja => loja.clear())
+  };
+})();
+
+const chaveFoto = id => `${id}`;
+const chaveMini = id => `${id}:mini`;
+
+/* URLs temporárias das miniaturas, reaproveitadas entre redesenhos. */
+const urlsMini = new Map();
+function soltarUrl(id){
+  const u = urlsMini.get(id);
+  if(u){ URL.revokeObjectURL(u); urlsMini.delete(id); }
+}
+
+/* =========================================================================
+   IMAGEM: reduzir antes de guardar (a foto do iPhone tem uns 4 MB)
+   ========================================================================= */
+async function prepararImagem(arquivo, ladoMaximo, qualidade){
+  const bitmap = await criarBitmap(arquivo);
+  const escala = Math.min(1, ladoMaximo / Math.max(bitmap.width, bitmap.height));
+  const l = Math.round(bitmap.width * escala);
+  const a = Math.round(bitmap.height * escala);
+  const tela = document.createElement('canvas');
+  tela.width = l; tela.height = a;
+  tela.getContext('2d').drawImage(bitmap, 0, 0, l, a);
+  if(bitmap.close) bitmap.close();
+  return new Promise(ok => tela.toBlob(b => ok(b), 'image/jpeg', qualidade));
+}
+function criarBitmap(arquivo){
+  if('createImageBitmap' in window){
+    return createImageBitmap(arquivo).catch(() => porTagImg(arquivo));
+  }
+  return porTagImg(arquivo);
+}
+function porTagImg(arquivo){
+  return new Promise((ok, falha) => {
+    const url = URL.createObjectURL(arquivo);
+    const img = new Image();
+    img.onload  = () => { URL.revokeObjectURL(url); ok(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); falha(new Error('não consegui abrir a imagem')); };
+    img.src = url;
+  });
+}
+function blobParaBase64(blob){
+  return new Promise((ok, falha) => {
+    const leitor = new FileReader();
+    leitor.onload  = () => ok(String(leitor.result).split(',')[1]);
+    leitor.onerror = () => falha(leitor.error);
+    leitor.readAsDataURL(blob);
+  });
+}
+
+/* =========================================================================
+   NÚMEROS E DATAS
+   ========================================================================= */
+function paraNumero(txt){
+  if(typeof txt === 'number') return isFinite(txt) ? txt : 0;
+  let s = String(txt || '').trim().replace(/[^\d.,-]/g,'');
+  if(!s) return 0;
+  const temVirgula = s.includes(','), temPonto = s.includes('.');
+  if(temVirgula && temPonto){
+    // O separador decimal é o que aparece por último (1.234,56 ou 1,234.56).
+    s = s.lastIndexOf(',') > s.lastIndexOf('.')
+      ? s.replace(/\./g,'').replace(',','.')
+      : s.replace(/,/g,'');
+  }else if(temVirgula){
+    s = s.replace(/,/g,'.');
+  }
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+const fmtUSD = v => 'US$ ' + (Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtBRL = v => 'R$ '  + (Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtMoeda = (v, moeda) => moeda === 'BRL' ? fmtBRL(v) : fmtUSD(v);
+const fmtNum = (v, casas=2) => (Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:casas, maximumFractionDigits:casas});
+
+function emDolar(d){
+  if(d.moeda === 'USD') return d.valor;
+  const taxa = Number(d.taxa) || Number(config.taxa) || 1;
+  return taxa > 0 ? d.valor / taxa : 0;
+}
+function dataLonga(iso){
+  const [a,m,dia] = String(iso).split('-').map(Number);
+  if(!a) return iso;
+  const d = new Date(a, (m||1)-1, dia||1);
+  return d.toLocaleDateString('pt-BR',{ weekday:'short', day:'2-digit', month:'short' });
+}
+function dataCurta(iso){
+  const [a,m,dia] = String(iso).split('-');
+  return (a && m && dia) ? `${dia}/${m}/${a}` : iso;
+}
+
+/* =========================================================================
+   CONFERÊNCIA DA POLÍTICA — o coração do app
+   ========================================================================= */
+function avaliar(d, todas){
+  const cat = catPorId(d.categoria);
+  const usd = emDolar(d);
+  const limite = cat.refeicao ? Number(config.limites[cat.id]) || 0 : 0;
+  const motivos = [];
+  let nivel = 'ok';
+
+  const marcar = (n, texto) => {
+    motivos.push({ nivel:n, texto });
+    if(n === 'violacao') nivel = 'violacao';
+    else if(n === 'atencao' && nivel !== 'violacao') nivel = 'atencao';
+  };
+
+  if(!d.valor){
+    marcar('atencao','Falta o valor da despesa.');
+  }
+
+  if(cat.refeicao && limite > 0 && d.valor){
+    const sobra = limite - usd;
+    if(usd > limite + 0.004){
+      marcar('violacao', `Passou do limite de ${fmtUSD(limite)} — excesso de ${fmtUSD(usd - limite)}. Não há exceção, nem com aprovação do gestor: esse excedente é seu.`);
+    }else if(usd >= limite * 0.9){
+      marcar('atencao', `No limite: sobram só ${fmtUSD(sobra)} de ${fmtUSD(limite)}.`);
+    }
+  }
+
+  if(d.alcool && cat.id === 'cafe'){
+    marcar('violacao','Álcool não pode ser lançado no café da manhã. Tire a bebida da conta.');
+  }
+  if(d.alcool && cat.refeicao && cat.id !== 'cafe'){
+    marcar('atencao','A bebida alcoólica entra no total — o limite continua valendo para a conta inteira.');
+  }
+
+  if(cat.id === 'hotel' && config.exigirRequisicao && !String(d.requisicao).trim()){
+    marcar('violacao','Falta o nº de requisição de viagem — obrigatório para hotéis.');
+  }
+
+  if(cat.refeicao && d.pessoas > 1 && !d.gestorSenior){
+    marcar('atencao', `Refeição com ${d.pessoas} pessoas: quem paga e lança tem de ser o gestor mais sênior presente.`);
+  }
+
+  if(!d.temComprovante){
+    marcar('atencao','Sem comprovante anexado.');
+  }
+
+  if(cat.refeicao && Array.isArray(todas)){
+    const iguais = todas.filter(o => o.id !== d.id && o.data === d.data && o.categoria === d.categoria);
+    if(iguais.length){
+      marcar('atencao', `Já existe outro lançamento de ${cat.nome.toLowerCase()} em ${dataCurta(d.data)} — confira se não é duplicado.`);
+    }
+  }
+
+  const excedente = (cat.refeicao && limite > 0 && usd > limite) ? usd - limite : 0;
+  return { nivel, motivos, limite, usd, excedente, cat };
+}
+
+const ROTULO_NIVEL = { ok:'Dentro da política', atencao:'Atenção', violacao:'Fora da política' };
+
+/* =========================================================================
+   LEITURA DO COMPROVANTE COM IA
+   ========================================================================= */
+const INSTRUCAO_SISTEMA = `Você lê fotos de comprovantes de despesa (recibos, notas de restaurante, faturas de hotel, cupons de táxi) de uma viagem corporativa e extrai os dados para prestação de contas.
+
+Regras:
+1. VALOR: use o total final efetivamente pago, já com impostos e gorjeta inclusos. Se houver "total" e "subtotal", use o total. Se a gorjeta estiver escrita à mão em cima do total impresso, use o valor final escrito à mão.
+2. MOEDA: deduza pelo símbolo, pelo idioma e pelo endereço do estabelecimento. USD para dólar americano, BRL para real. Se for outra moeda, responda "OUTRA".
+3. DATA: converta para AAAA-MM-DD. Atenção ao formato: comprovantes dos EUA usam MM/DD/AAAA, os do Brasil usam DD/MM/AAAA.
+4. CATEGORIA: deduza pelo horário e pelos itens. cafe (café da manhã, até ~10h30), almoco (~11h–15h30), jantar (a partir de ~17h30), hotel (diária/hospedagem), transporte (táxi, Uber, trem, estacionamento, combustível), aereo (passagem), bagagem, outro.
+5. ALCOOL: true apenas se algum item da conta for bebida alcoólica (vinho, cerveja, drink, wine, beer, cocktail, liquor, bar). Na dúvida, false.
+6. Campos que você não conseguir ler com segurança: devolva string vazia (ou 0 para números). NÃO invente nada.
+7. CONFIANCA: "alta" se a foto está nítida e os campos principais são claros; "media" se leu com esforço; "baixa" se a imagem está ruim ou cortada.
+8. Responda apenas com o JSON pedido.`;
+
+const ESQUEMA = {
+  type:'object',
+  properties:{
+    estabelecimento:{ type:'string', description:'Nome do estabelecimento, ou string vazia.' },
+    data:{ type:'string', description:'Data no formato AAAA-MM-DD, ou string vazia.' },
+    hora:{ type:'string', description:'Hora no formato HH:MM (24h), ou string vazia.' },
+    valor_total:{ type:'number', description:'Total pago, com impostos e gorjeta. 0 se não conseguir ler.' },
+    moeda:{ type:'string', enum:['USD','BRL','OUTRA'] },
+    gorjeta:{ type:'number', description:'Gorjeta, se aparecer separada. 0 se não houver.' },
+    impostos:{ type:'number', description:'Impostos/taxas, se aparecerem separados. 0 se não houver.' },
+    cidade:{ type:'string' },
+    pais:{ type:'string' },
+    categoria:{ type:'string', enum:['cafe','almoco','jantar','hotel','transporte','aereo','bagagem','outro'] },
+    contem_alcool:{ type:'boolean' },
+    pessoas:{ type:'number', description:'Nº de pessoas (couvert/talheres/itens). 1 se não der para saber.' },
+    metodo_pagamento:{ type:'string', description:'Ex.: Visa final 1234, dinheiro. Vazio se não aparecer.' },
+    resumo_itens:{ type:'string', description:'Resumo curto do que foi consumido, até 120 caracteres.' },
+    confianca:{ type:'string', enum:['alta','media','baixa'] }
+  },
+  required:['estabelecimento','data','hora','valor_total','moeda','gorjeta','impostos','cidade','pais','categoria','contem_alcool','pessoas','metodo_pagamento','resumo_itens','confianca'],
+  additionalProperties:false
+};
+
+async function lerComprovanteComIA(blob){
+  if(!config.chaveApi) throw new Error('Configure a chave da API para a leitura automática.');
+  if(!navigator.onLine) throw new Error('Sem internet agora. Digite os dados — a foto já está guardada.');
+
+  const base64 = await blobParaBase64(blob);
+
+  const configSaida = { format:{ type:'json_schema', schema: ESQUEMA } };
+  // "effort" existe nos modelos da família 5; o Haiku 4.5 rejeita o parâmetro.
+  if(!/haiku/i.test(config.modelo)) configSaida.effort = 'low';
+
+  const resposta = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-api-key': config.chaveApi,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body: JSON.stringify({
+      // Folga no limite: nos modelos novos o raciocínio conta junto com a resposta,
+      // e um teto apertado corta o JSON no meio.
+      model: config.modelo,
+      max_tokens: 8000,
+      system: INSTRUCAO_SISTEMA,
+      output_config: configSaida,
+      messages:[{
+        role:'user',
+        content:[
+          { type:'image', source:{ type:'base64', media_type:'image/jpeg', data: base64 } },
+          { type:'text',  text:'Extraia os dados deste comprovante. Hoje é ' + hojeISO() + '.' }
+        ]
+      }]
+    })
+  });
+
+  if(!resposta.ok){
+    let detalhe = '';
+    try{ const erro = await resposta.json(); detalhe = erro?.error?.message || ''; }catch(e){}
+    if(resposta.status === 401) throw new Error('Chave da API inválida. Confira em Configurações.');
+    if(resposta.status === 429) throw new Error('Limite de uso da API atingido. Tente de novo em instantes.');
+    throw new Error(`Erro ${resposta.status} da API${detalhe ? ': ' + detalhe : ''}`);
+  }
+
+  const dados = await resposta.json();
+  if(dados.stop_reason === 'refusal') throw new Error('A IA recusou processar esta imagem.');
+  const bloco = (dados.content || []).find(b => b.type === 'text');
+  if(!bloco) throw new Error('Resposta vazia da IA.');
+  return JSON.parse(bloco.text);
+}
+
+/* =========================================================================
+   ESTADO DA TELA
+   ========================================================================= */
+let emEdicao = null;      // despesa aberta no modal
+let fotoPendente = null;  // { blob, mini, tipo } ainda não salvo
+let filtroAtual = 'todas';
+
+/* =========================================================================
+   AVISOS
+   ========================================================================= */
+let tempoAviso = null;
+function mostrarAviso(texto, tipo='info', segundos=5){
+  const el = $('#aviso');
+  el.textContent = texto;
+  el.className = 'mostrando ' + tipo;
+  clearTimeout(tempoAviso);
+  if(segundos) tempoAviso = setTimeout(esconderAviso, segundos * 1000);
+}
+function esconderAviso(){ $('#aviso').className = ''; }
+
+/* =========================================================================
+   MODAIS
+   ========================================================================= */
+function abrirModal(sel){ $(sel).classList.add('aberto'); document.body.style.overflow = 'hidden'; }
+function fecharModal(el){
+  el.classList.remove('aberto');
+  if(!$$('.fundo-modal.aberto').length) document.body.style.overflow = '';
+}
+$$('.fundo-modal').forEach(fundo => {
+  fundo.addEventListener('click', ev => { if(ev.target === fundo) fecharModal(fundo); });
+  fundo.querySelectorAll('[data-fechar]').forEach(b => b.addEventListener('click', () => fecharModal(fundo)));
+});
+document.addEventListener('keydown', ev => {
+  if(ev.key === 'Escape') $$('.fundo-modal.aberto').forEach(fecharModal);
+});
+
+/* =========================================================================
+   CAPTURA DA FOTO
+   ========================================================================= */
+$('#btnCamera').addEventListener('click', () => $('#entradaCamera').click());
+$('#btnCameraRodape').addEventListener('click', () => $('#entradaCamera').click());
+$('#btnArquivo').addEventListener('click', () => $('#entradaArquivo').click());
+$('#btnManual').addEventListener('click', () => abrirDespesa(null, null));
+
+$('#entradaCamera').addEventListener('change', ev => receberArquivo(ev.target.files[0], ev.target));
+$('#entradaArquivo').addEventListener('change', ev => receberArquivo(ev.target.files[0], ev.target));
+
+async function receberArquivo(arquivo, entrada){
+  if(!arquivo) return;
+  if(entrada) entrada.value = '';
+
+  const ehPdf = arquivo.type === 'application/pdf' || /\.pdf$/i.test(arquivo.name);
+  try{
+    if(ehPdf){
+      fotoPendente = { blob: arquivo, mini: null, tipo:'application/pdf' };
+      abrirDespesa(null, fotoPendente);
+      mostrarAviso('PDF guardado. A leitura automática só funciona com foto — preencha os campos à mão.','info',7);
+      return;
+    }
+    mostrarAviso('Preparando a imagem…','info',3);
+    const [foto, mini] = await Promise.all([
+      prepararImagem(arquivo, 1600, 0.78),
+      prepararImagem(arquivo, 320, 0.7)
+    ]);
+    fotoPendente = { blob: foto, mini, tipo:'image/jpeg' };
+    esconderAviso();
+    abrirDespesa(null, fotoPendente);
+    if(config.lerAuto && config.chaveApi) lerAgora();
+  }catch(e){
+    console.error(e);
+    mostrarAviso('Não consegui abrir esse arquivo. Tente outra foto.','erro');
+  }
+}
+
+/* =========================================================================
+   MODAL DA DESPESA
+   ========================================================================= */
+function abrirDespesa(despesa, foto){
+  emEdicao = despesa;
+  if(!despesa) fotoPendente = foto || null;
+
+  $('#tituloDespesa').textContent = despesa ? 'Despesa' : 'Nova despesa';
+  $('#btnExcluir').style.display = despesa ? '' : 'none';
+  $('#btnSalvar').textContent = despesa ? 'Salvar alterações' : 'Salvar despesa';
+
+  const d = despesa || {
+    categoria: sugerirCategoriaPorHora(),
+    valor: 0, moeda:'USD', taxa: config.taxa,
+    data: hojeISO(), hora: agoraHM(),
+    estabelecimento:'', cidade:'', pais:'',
+    requisicao: config.requisicao, pessoas:1, pagamento:'',
+    alcool:false, gestorSenior:true, observacao:'', lancado:false
+  };
+
+  desenharChips(d.categoria);
+  $('#cValor').value = d.valor ? fmtNum(d.valor) : '';
+  $('#cMoeda').value = d.moeda;
+  $('#cTaxa').value  = fmtNum(d.taxa || config.taxa);
+  $('#cData').value  = d.data;
+  $('#cHora').value  = d.hora;
+  $('#cEstabelecimento').value = d.estabelecimento;
+  $('#cCidade').value = d.cidade;
+  $('#cPais').value   = d.pais;
+  $('#cRequisicao').value = d.requisicao;
+  $('#cPessoas').value = d.pessoas;
+  $('#cPagamento').value = d.pagamento;
+  $('#cAlcool').checked = d.alcool;
+  $('#cGestor').checked = d.gestorSenior;
+  $('#cObservacao').value = d.observacao;
+
+  atualizarVisibilidadeTaxa();
+  desenharComprovante(despesa);
+  desenharAreaLeitura();
+  desenharLancamento(despesa);
+  atualizarVeredito();
+  abrirModal('#modalDespesa');
+}
+
+function sugerirCategoriaPorHora(){
+  const h = new Date().getHours() + new Date().getMinutes()/60;
+  if(h < 10.5) return 'cafe';
+  if(h < 15.5) return 'almoco';
+  if(h < 17.5) return 'outro';
+  return 'jantar';
+}
+
+function desenharChips(ativa){
+  $('#chipsCategoria').innerHTML = CATEGORIAS.map(c => {
+    const lim = config.limites[c.id];
+    return `<button type="button" class="chip ${c.id === ativa ? 'ativo' : ''}" data-cat="${c.id}">
+      ${c.icone} ${c.nome}${lim ? `<small>até ${fmtUSD(lim)}</small>` : ''}
+    </button>`;
+  }).join('');
+  $$('#chipsCategoria .chip').forEach(b => b.addEventListener('click', () => {
+    $$('#chipsCategoria .chip').forEach(o => o.classList.remove('ativo'));
+    b.classList.add('ativo');
+    atualizarVeredito();
+  }));
+}
+const categoriaSelecionada = () => ($('#chipsCategoria .chip.ativo')?.dataset.cat) || 'outro';
+
+function atualizarVisibilidadeTaxa(){
+  const brl = $('#cMoeda').value === 'BRL';
+  $('#cTaxa').closest('.campo').style.opacity = brl ? '1' : '.4';
+  $('#cTaxa').disabled = !brl;
+}
+
+async function desenharComprovante(despesa){
+  const area = $('#areaComprovante');
+  const temFoto = despesa ? despesa.temComprovante : !!fotoPendente;
+  if(!temFoto){
+    area.innerHTML = `<div class="nota">Sem comprovante. Você ainda pode <b>fotografar depois</b> — abra esta despesa e toque em anexar.</div>
+      <button class="btn largo pequeno" id="btnAnexarAqui" style="margin-top:8px">Anexar comprovante</button>`;
+    $('#btnAnexarAqui').addEventListener('click', () => $('#entradaArquivo').click());
+    return;
+  }
+  const tipo = despesa ? despesa.tipoComprovante : fotoPendente.tipo;
+  if(tipo === 'application/pdf'){
+    area.innerHTML = `<div class="nota">📄 Comprovante em PDF guardado. <button class="btn pequeno" id="btnVerPdf" style="margin-left:6px">Abrir</button></div>`;
+    $('#btnVerPdf').addEventListener('click', async () => {
+      const blob = despesa ? await BD.ler(chaveFoto(despesa.id)) : fotoPendente.blob;
+      if(blob) window.open(URL.createObjectURL(blob), '_blank');
+    });
+    return;
+  }
+  const blob = despesa ? await BD.ler(chaveFoto(despesa.id)) : fotoPendente.blob;
+  if(!blob){ area.innerHTML = `<div class="nota">Comprovante não encontrado no aparelho.</div>`; return; }
+  const url = URL.createObjectURL(blob);
+  area.innerHTML = `<img class="previa" src="${url}" alt="Comprovante">`;
+  area.querySelector('img').addEventListener('load', () => setTimeout(() => URL.revokeObjectURL(url), 1000));
+  area.querySelector('img').addEventListener('click', () => window.open(URL.createObjectURL(blob), '_blank'));
+}
+
+function desenharAreaLeitura(){
+  const area = $('#areaLeitura');
+  const temImagem = (emEdicao && emEdicao.temComprovante && emEdicao.tipoComprovante !== 'application/pdf')
+                 || (!emEdicao && fotoPendente && fotoPendente.tipo !== 'application/pdf');
+  if(!temImagem){ area.innerHTML = ''; return; }
+  if(!config.chaveApi){
+    area.innerHTML = `<div class="nota">Quer que o app leia o comprovante sozinho? Coloque a chave da API em <b>Configurações</b>.</div>`;
+    return;
+  }
+  area.innerHTML = `<button class="btn largo" id="btnLerIA">
+    <svg viewBox="0 0 24 24"><path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4L12 2z"/></svg>
+    Ler comprovante com IA
+  </button>`;
+  $('#btnLerIA').addEventListener('click', lerAgora);
+}
+
+async function lerAgora(){
+  const btn = $('#btnLerIA');
+  const blob = emEdicao ? await BD.ler(chaveFoto(emEdicao.id)) : (fotoPendente && fotoPendente.blob);
+  if(!blob){ mostrarAviso('Nenhuma imagem para ler.','erro'); return; }
+
+  if(btn){ btn.disabled = true; btn.innerHTML = '<svg class="girando" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2z"/></svg> Lendo o comprovante…'; }
+  mostrarAviso('A IA está lendo o comprovante…','info',0);
+
+  try{
+    const r = await lerComprovanteComIA(blob);
+    aplicarLeitura(r);
+    esconderAviso();
+    const alerta = r.confianca === 'baixa'
+      ? 'Li com dificuldade — confira valor e data antes de salvar.'
+      : (r.moeda === 'OUTRA' ? 'A moeda não é dólar nem real: ajuste o valor à mão.' : 'Pronto. Confira o tipo de despesa e salve.');
+    mostrarAviso(alerta, r.confianca === 'baixa' || r.moeda === 'OUTRA' ? 'info' : 'ok', 6);
+  }catch(e){
+    console.error(e);
+    mostrarAviso(e.message || 'Não consegui ler o comprovante.','erro',8);
+  }finally{
+    desenharAreaLeitura();
+  }
+}
+
+function aplicarLeitura(r){
+  if(r.valor_total > 0) $('#cValor').value = fmtNum(r.valor_total);
+  if(r.moeda === 'USD' || r.moeda === 'BRL'){ $('#cMoeda').value = r.moeda; atualizarVisibilidadeTaxa(); }
+  if(/^\d{4}-\d{2}-\d{2}$/.test(r.data || '')) $('#cData').value = r.data;
+  if(/^\d{2}:\d{2}$/.test(r.hora || '')) $('#cHora').value = r.hora;
+  if(r.estabelecimento) $('#cEstabelecimento').value = r.estabelecimento;
+  if(r.cidade) $('#cCidade').value = r.cidade;
+  if(r.pais) $('#cPais').value = r.pais;
+  if(r.metodo_pagamento) $('#cPagamento').value = r.metodo_pagamento;
+  if(r.pessoas > 1) $('#cPessoas').value = Math.round(r.pessoas);
+  if(r.contem_alcool) $('#cAlcool').checked = true;
+  if(r.categoria) desenharChips(r.categoria);
+
+  const detalhes = [];
+  if(r.resumo_itens) detalhes.push(r.resumo_itens);
+  if(r.gorjeta > 0)  detalhes.push('gorjeta ' + fmtNum(r.gorjeta));
+  if(r.impostos > 0) detalhes.push('impostos ' + fmtNum(r.impostos));
+  const atual = $('#cObservacao').value.trim();
+  if(detalhes.length && !atual) $('#cObservacao').value = detalhes.join(' · ');
+
+  leituraFoiIA = true;
+  atualizarVeredito();
+}
+let leituraFoiIA = false;
+
+function despesaDoFormulario(){
+  return normalizarDespesa({
+    id: emEdicao ? emEdicao.id : undefined,
+    criadoEm: emEdicao ? emEdicao.criadoEm : Date.now(),
+    categoria: categoriaSelecionada(),
+    valor: paraNumero($('#cValor').value),
+    moeda: $('#cMoeda').value,
+    taxa: paraNumero($('#cTaxa').value) || config.taxa,
+    data: $('#cData').value || hojeISO(),
+    hora: $('#cHora').value,
+    estabelecimento: $('#cEstabelecimento').value.trim(),
+    cidade: $('#cCidade').value.trim(),
+    pais: $('#cPais').value.trim(),
+    requisicao: $('#cRequisicao').value.trim(),
+    pessoas: $('#cPessoas').value,
+    pagamento: $('#cPagamento').value.trim(),
+    alcool: $('#cAlcool').checked,
+    gestorSenior: $('#cGestor').checked,
+    observacao: $('#cObservacao').value.trim(),
+    lancado: emEdicao ? emEdicao.lancado : false,
+    temComprovante: emEdicao ? emEdicao.temComprovante : !!fotoPendente,
+    tipoComprovante: emEdicao ? emEdicao.tipoComprovante : (fotoPendente ? fotoPendente.tipo : ''),
+    lidoPorIA: (emEdicao ? emEdicao.lidoPorIA : false) || leituraFoiIA
+  });
+}
+
+function atualizarVeredito(){
+  const d = despesaDoFormulario();
+  const r = avaliar(d, despesas);
+  const el = $('#vereditoDespesa');
+
+  const icone = { ok:'✓', atencao:'!', violacao:'✕' }[r.nivel];
+  let barra = '';
+  if(r.cat.refeicao && r.limite > 0){
+    const pct = Math.min(100, (r.usd / r.limite) * 100);
+    barra = `<div class="barra"><i class="${r.nivel}" style="width:${pct}%"></i></div>
+      <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--cinza);margin-top:5px">
+        <span>${fmtUSD(r.usd)} de ${fmtUSD(r.limite)}</span>
+        <span>${r.excedente > 0 ? 'excesso ' + fmtUSD(r.excedente) : 'sobram ' + fmtUSD(Math.max(0, r.limite - r.usd))}</span>
+      </div>`;
+  }
+  const lista = r.motivos.length ? `<ul>${r.motivos.map(m => `<li>${escapar(m.texto)}</li>`).join('')}</ul>` : '';
+  const conversao = d.moeda === 'BRL' && d.valor
+    ? `<div style="font-size:.75rem;color:var(--cinza);margin-top:6px">${fmtBRL(d.valor)} ÷ ${fmtNum(d.taxa)} = ${fmtUSD(r.usd)}</div>` : '';
+
+  el.className = 'veredito ' + r.nivel;
+  el.innerHTML = `<div class="cabeca">${icone} ${ROTULO_NIVEL[r.nivel]}</div>${lista}${barra}${conversao}`;
+}
+
+['#cValor','#cMoeda','#cTaxa','#cData','#cPessoas','#cRequisicao'].forEach(sel =>
+  $(sel).addEventListener('input', () => { if(sel === '#cMoeda') atualizarVisibilidadeTaxa(); atualizarVeredito(); }));
+$('#cMoeda').addEventListener('change', () => { atualizarVisibilidadeTaxa(); atualizarVeredito(); });
+$('#cAlcool').addEventListener('change', atualizarVeredito);
+$('#cGestor').addEventListener('change', atualizarVeredito);
+
+/* ---------- Salvar / excluir ---------- */
+$('#btnSalvar').addEventListener('click', async () => {
+  const d = despesaDoFormulario();
+  if(!d.valor){ mostrarAviso('Informe o valor da despesa.','erro'); $('#cValor').focus(); return; }
+
+  if(fotoPendente && !emEdicao){
+    try{
+      await BD.guardar(chaveFoto(d.id), fotoPendente.blob);
+      if(fotoPendente.mini) await BD.guardar(chaveMini(d.id), fotoPendente.mini);
+      d.temComprovante = true;
+      d.tipoComprovante = fotoPendente.tipo;
+    }catch(e){
+      console.error(e);
+      d.temComprovante = false;
+      mostrarAviso('A despesa foi salva, mas não consegui guardar a foto neste aparelho.','erro',7);
+    }
+  }else if(fotoPendente && emEdicao){
+    try{
+      await BD.guardar(chaveFoto(d.id), fotoPendente.blob);
+      if(fotoPendente.mini) await BD.guardar(chaveMini(d.id), fotoPendente.mini);
+      d.temComprovante = true;
+      d.tipoComprovante = fotoPendente.tipo;
+      soltarUrl(d.id);
+    }catch(e){ console.error(e); }
+  }
+
+  if(emEdicao){
+    const i = despesas.findIndex(o => o.id === emEdicao.id);
+    if(i >= 0) despesas[i] = d; else despesas.push(d);
+  }else{
+    despesas.push(d);
+  }
+  salvarDespesas();
+
+  fotoPendente = null;
+  leituraFoiIA = false;
+  emEdicao = null;
+  fecharModal($('#modalDespesa'));
+  desenhar();
+
+  const r = avaliar(d, despesas);
+  if(r.nivel === 'violacao') mostrarAviso('Salvo — mas está fora da política: ' + r.motivos.find(m => m.nivel === 'violacao').texto,'erro',9);
+  else if(r.nivel === 'atencao') mostrarAviso('Salvo com pendência: ' + r.motivos[0].texto,'info',7);
+  else mostrarAviso('Salvo, dentro do limite.','ok');
+});
+
+$('#btnExcluir').addEventListener('click', async () => {
+  if(!emEdicao) return;
+  if(!confirm('Excluir esta despesa e o comprovante dela?')) return;
+  const id = emEdicao.id;
+  despesas = despesas.filter(d => d.id !== id);
+  salvarDespesas();
+  soltarUrl(id);
+  try{ await BD.apagar(chaveFoto(id)); await BD.apagar(chaveMini(id)); }catch(e){}
+  emEdicao = null;
+  fecharModal($('#modalDespesa'));
+  desenhar();
+  mostrarAviso('Despesa excluída.','info');
+});
+
+/* =========================================================================
+   LANÇAMENTO NO SITE DA EMPRESA (a etapa de digitar tudo de novo)
+   ========================================================================= */
+function camposParaLancar(d){
+  const r = avaliar(d, despesas);
+  const campos = [
+    ['Data',            dataCurta(d.data)],
+    ['Tipo',            catPorId(d.categoria).nome],
+    ['Estabelecimento', d.estabelecimento || '—'],
+    ['Valor',           fmtMoeda(d.valor, d.moeda).replace(/^(US\$|R\$)\s/,'')],
+    ['Moeda',           d.moeda],
+    ['Local',           [d.cidade, d.pais].filter(Boolean).join(', ') || '—'],
+    ['Requisição',      d.requisicao || '—'],
+    ['Pagamento',       d.pagamento || '—'],
+    ['Descrição',       descricaoPadrao(d)]
+  ];
+  if(d.moeda === 'BRL') campos.splice(5, 0, ['Equivalente', fmtUSD(r.usd)]);
+  return campos;
+}
+function descricaoPadrao(d){
+  const cat = catPorId(d.categoria);
+  const partes = [cat.nome];
+  if(d.estabelecimento) partes.push(d.estabelecimento);
+  if(d.pessoas > 1) partes.push(`${d.pessoas} pessoas`);
+  if(d.observacao) partes.push(d.observacao);
+  return partes.join(' — ');
+}
+
+function desenharLancamento(despesa){
+  const area = $('#areaLancamento');
+  if(!despesa){ area.innerHTML = ''; return; }
+  const campos = camposParaLancar(despesa);
+  area.innerHTML = `
+    <div class="divisor"></div>
+    <h3 style="font-size:.9rem;margin:0 0 2px">Lançar no site da empresa</h3>
+    <p class="explicacao">Toque em copiar e cole campo a campo no formulário da empresa.</p>
+    ${campos.map(([rot,val]) => `
+      <div class="linha-copia">
+        <span class="rot">${rot}</span>
+        <span class="val">${escapar(val)}</span>
+        <button type="button" data-copiar="${escapar(val)}">copiar</button>
+      </div>`).join('')}
+    <label class="interruptor" style="margin-top:12px">
+      <input type="checkbox" id="cLancado" ${despesa.lancado ? 'checked' : ''}><span class="trilho"></span> Já lancei esta despesa no sistema
+    </label>`;
+
+  area.querySelectorAll('[data-copiar]').forEach(b => b.addEventListener('click', () => copiar(b.dataset.copiar, b)));
+  $('#cLancado').addEventListener('change', ev => {
+    const i = despesas.findIndex(o => o.id === despesa.id);
+    if(i >= 0){ despesas[i].lancado = ev.target.checked; salvarDespesas(); desenhar(); }
+  });
+}
+
+async function copiar(texto, botao){
+  try{
+    await navigator.clipboard.writeText(texto);
+  }catch(e){
+    const t = document.createElement('textarea');
+    t.value = texto; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try{ document.execCommand('copy'); }catch(e2){}
+    t.remove();
+  }
+  if(botao){
+    const antes = botao.textContent;
+    botao.textContent = 'copiado';
+    setTimeout(() => { botao.textContent = antes; }, 1200);
+  }
+}
+
+/* =========================================================================
+   DESENHAR A TELA
+   ========================================================================= */
+function desenhar(){
+  desenharResumo();
+  desenharLista();
+}
+
+function desenharResumo(){
+  const totalUSD = despesas.reduce((s,d) => s + emDolar(d), 0);
+  const avaliadas = despesas.map(d => avaliar(d, despesas));
+  const fora = avaliadas.filter(r => r.nivel === 'violacao').length;
+  const excedente = avaliadas.reduce((s,r) => s + r.excedente, 0);
+  const aLancar = despesas.filter(d => !d.lancado).length;
+
+  $('#resumo').innerHTML = `
+    <div class="cartao">
+      <div class="rotulo">Total da viagem</div>
+      <div class="valor">${fmtUSD(totalUSD)}</div>
+      <div class="sub">${despesas.length} despesa${despesas.length === 1 ? '' : 's'}</div>
+    </div>
+    <div class="cartao ${fora ? 'alerta' : ''}">
+      <div class="rotulo">Fora da política</div>
+      <div class="valor">${fora}</div>
+      <div class="sub">${excedente > 0 ? 'excesso de ' + fmtUSD(excedente) : 'tudo dentro dos limites'}</div>
+    </div>
+    <div class="cartao ${aLancar ? 'aviso' : ''}">
+      <div class="rotulo">A lançar</div>
+      <div class="valor">${aLancar}</div>
+      <div class="sub">no site da empresa</div>
+    </div>
+    <div class="cartao">
+      <div class="rotulo">Comprovantes</div>
+      <div class="valor">${despesas.filter(d => d.temComprovante).length}/${despesas.length}</div>
+      <div class="sub">guardados no aparelho</div>
+    </div>`;
+}
+
+function despesasFiltradas(){
+  const comAvaliacao = despesas.map(d => ({ d, r: avaliar(d, despesas) }));
+  switch(filtroAtual){
+    case 'fora':      return comAvaliacao.filter(x => x.r.nivel === 'violacao');
+    case 'atencao':   return comAvaliacao.filter(x => x.r.nivel === 'atencao');
+    case 'alancar':   return comAvaliacao.filter(x => !x.d.lancado);
+    case 'refeicoes': return comAvaliacao.filter(x => x.r.cat.refeicao);
+    default:          return comAvaliacao;
+  }
+}
+
+function desenharLista(){
+  const alvo = $('#lista');
+  const itens = despesasFiltradas();
+
+  if(!despesas.length){
+    alvo.innerHTML = `<div class="vazio">Nenhuma despesa ainda.<br>Toque em <b>Fotografar comprovante</b> assim que pagar a conta.</div>`;
+    return;
+  }
+  if(!itens.length){
+    alvo.innerHTML = `<div class="vazio">Nada neste filtro.</div>`;
+    return;
+  }
+
+  const porDia = new Map();
+  itens.sort((a,b) => (b.d.data + (b.d.hora||'')).localeCompare(a.d.data + (a.d.hora||'')));
+  itens.forEach(x => {
+    if(!porDia.has(x.d.data)) porDia.set(x.d.data, []);
+    porDia.get(x.d.data).push(x);
+  });
+
+  alvo.innerHTML = Array.from(porDia.entries()).map(([dia, doDia]) => {
+    const totalDia = doDia.reduce((s,x) => s + x.r.usd, 0);
+    return `<div class="dia">
+      <h3><span>${dataLonga(dia)}</span><b>${fmtUSD(totalDia)}</b></h3>
+      ${doDia.map(({d,r}) => cartaoDespesa(d, r)).join('')}
+    </div>`;
+  }).join('');
+
+  alvo.querySelectorAll('.despesa').forEach(el => {
+    el.addEventListener('click', () => {
+      const d = despesas.find(o => o.id === el.dataset.id);
+      if(d){ fotoPendente = null; leituraFoiIA = false; abrirDespesa(d); }
+    });
+  });
+  carregarMiniaturas();
+}
+
+function cartaoDespesa(d, r){
+  const cat = catPorId(d.categoria);
+  const detalhe = [
+    d.estabelecimento || cat.nome,
+    d.hora,
+    d.pessoas > 1 ? `${d.pessoas} pessoas` : ''
+  ].filter(Boolean).join(' · ');
+
+  const etiquetas = [];
+  if(r.nivel === 'violacao') etiquetas.push(`<span class="etiqueta violacao">fora</span>`);
+  else if(r.nivel === 'atencao') etiquetas.push(`<span class="etiqueta atencao">atenção</span>`);
+  if(!d.lancado) etiquetas.push(`<span class="etiqueta neutra">a lançar</span>`);
+
+  return `<div class="despesa ${r.nivel}" data-id="${d.id}">
+    ${d.temComprovante
+      ? `<img class="miniatura" data-mini="${d.id}" alt="">`
+      : `<div class="miniatura">sem foto</div>`}
+    <div class="info">
+      <div class="t"><span class="nome">${cat.icone} ${escapar(cat.nome)}</span>${etiquetas.join('')}</div>
+      <div class="s">${escapar(detalhe)}</div>
+    </div>
+    <div class="dir">
+      <div class="v">${fmtMoeda(d.valor, d.moeda)}</div>
+      <div class="m">${d.moeda === 'BRL' ? fmtUSD(r.usd) : (r.limite ? 'lim. ' + fmtUSD(r.limite) : '')}</div>
+    </div>
+  </div>`;
+}
+
+async function carregarMiniaturas(){
+  for(const img of $$('#lista img[data-mini]')){
+    const id = img.dataset.mini;
+    if(urlsMini.has(id)){ img.src = urlsMini.get(id); continue; }
+    try{
+      const blob = await BD.ler(chaveMini(id)) || await BD.ler(chaveFoto(id));
+      if(!blob) continue;
+      if(blob.type === 'application/pdf'){ img.replaceWith(criarSelo('PDF')); continue; }
+      const url = URL.createObjectURL(blob);
+      urlsMini.set(id, url);
+      img.src = url;
+    }catch(e){ /* miniatura é enfeite: falhar aqui não pode quebrar a lista */ }
+  }
+}
+function criarSelo(texto){
+  const el = document.createElement('div');
+  el.className = 'miniatura';
+  el.textContent = texto;
+  return el;
+}
+
+const escapar = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- Filtros ---------- */
+$$('#filtros .filtro').forEach(b => b.addEventListener('click', () => {
+  $$('#filtros .filtro').forEach(o => o.classList.remove('ativo'));
+  b.classList.add('ativo');
+  filtroAtual = b.dataset.filtro;
+  desenharLista();
+}));
+
+/* =========================================================================
+   EXPORTAÇÃO
+   ========================================================================= */
+function ordenadas(){
+  return despesas.slice().sort((a,b) => (a.data + (a.hora||'')).localeCompare(b.data + (b.hora||'')));
+}
+
+function nomeArquivoComprovante(d, indice){
+  const cat = catPorId(d.categoria).id;
+  const valor = fmtNum(d.valor).replace(/\./g,'').replace(',','-');
+  const est = (d.estabelecimento || 'comprovante')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,28).toLowerCase();
+  const ext = d.tipoComprovante === 'application/pdf' ? 'pdf' : 'jpg';
+  return `${String(indice).padStart(3,'0')}_${d.data}_${cat}_${est}_${d.moeda}${valor}.${ext}`;
+}
+
+function montarCSV(){
+  const cab = ['Nº','Data','Hora','Tipo','Estabelecimento','Cidade','País','Moeda','Valor','Cotação (R$/US$)',
+               'Valor em US$','Limite US$','Excedente US$','Situação','Motivos','Álcool','Pessoas',
+               'Gestor sênior','Nº requisição','Pagamento','Observação','Arquivo do comprovante','Lançado no sistema'];
+  const linhas = ordenadas().map((d,i) => {
+    const r = avaliar(d, despesas);
+    return [
+      i+1,
+      dataCurta(d.data),
+      d.hora,
+      catPorId(d.categoria).nome,
+      d.estabelecimento,
+      d.cidade,
+      d.pais,
+      d.moeda,
+      fmtNum(d.valor),
+      d.moeda === 'BRL' ? fmtNum(d.taxa) : '',
+      fmtNum(r.usd),
+      r.limite ? fmtNum(r.limite) : '',
+      r.excedente ? fmtNum(r.excedente) : '',
+      ROTULO_NIVEL[r.nivel],
+      r.motivos.map(m => m.texto).join(' | '),
+      d.alcool ? 'Sim' : 'Não',
+      d.pessoas,
+      d.gestorSenior ? 'Sim' : 'Não',
+      d.requisicao,
+      d.pagamento,
+      d.observacao,
+      d.temComprovante ? nomeArquivoComprovante(d, i+1) : '',
+      d.lancado ? 'Sim' : 'Não'
+    ];
+  });
+
+  const celula = v => {
+    const s = String(v ?? '');
+    return /[";\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  // Ponto e vírgula + BOM: é o que o Excel em português abre certo, sem passo extra.
+  const texto = [cab, ...linhas].map(l => l.map(celula).join(';')).join('\r\n');
+  return '﻿' + texto;
+}
+
+function montarJSON(){
+  return JSON.stringify({
+    app:'despesas-viagem',
+    versao:1,
+    exportadoEm:new Date().toISOString(),
+    config:{ limites:config.limites, taxa:config.taxa, viagem:config.viagem, requisicao:config.requisicao },
+    despesas: ordenadas().map((d,i) => {
+      const r = avaliar(d, despesas);
+      return Object.assign({}, d, {
+        valorEmDolar: Number(r.usd.toFixed(2)),
+        limiteEmDolar: r.limite || null,
+        excedenteEmDolar: Number(r.excedente.toFixed(2)),
+        situacao: ROTULO_NIVEL[r.nivel],
+        motivos: r.motivos.map(m => m.texto),
+        arquivoComprovante: d.temComprovante ? 'comprovantes/' + nomeArquivoComprovante(d, i+1) : null
+      });
+    })
+  }, null, 2);
+}
+
+function baixar(blob, nome){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+const carimbo = () => new Date().toISOString().slice(0,10);
+const nomeBase = () => 'despesas' + (config.viagem ? '-' + config.viagem.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').toLowerCase() : '') + '-' + carimbo();
+
+$('#btnExportar').addEventListener('click', () => abrirModal('#modalExportar'));
+$('#btnCsv').addEventListener('click', () => {
+  if(!despesas.length) return mostrarAviso('Não há despesas para exportar.','erro');
+  baixar(new Blob([montarCSV()], {type:'text/csv;charset=utf-8'}), nomeBase() + '.csv');
+});
+$('#btnJson').addEventListener('click', () => {
+  if(!despesas.length) return mostrarAviso('Não há despesas para exportar.','erro');
+  baixar(new Blob([montarJSON()], {type:'application/json'}), nomeBase() + '.json');
+});
+
+/* ---------- ZIP (sem compressão, escrito à mão para não depender de nada) ---------- */
+const TABELA_CRC = (() => {
+  const t = new Uint32Array(256);
+  for(let i=0;i<256;i++){
+    let c = i;
+    for(let k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[i] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(dados){
+  let c = 0xFFFFFFFF;
+  for(let i=0;i<dados.length;i++) c = TABELA_CRC[(c ^ dados[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function horaDOS(data){
+  const hora = ((data.getHours() & 31) << 11) | ((data.getMinutes() & 63) << 5) | ((data.getSeconds()/2) & 31);
+  const dia  = (((data.getFullYear() - 1980) & 127) << 9) | (((data.getMonth()+1) & 15) << 5) | (data.getDate() & 31);
+  return { hora, dia };
+}
+function montarZip(arquivos){
+  const codificador = new TextEncoder();
+  const partes = [];
+  const central = [];
+  let deslocamento = 0;
+  const { hora, dia } = horaDOS(new Date());
+
+  arquivos.forEach(arq => {
+    const nome = codificador.encode(arq.nome);
+    const crc = crc32(arq.dados);
+    const tam = arq.dados.length;
+
+    const cabecalho = new DataView(new ArrayBuffer(30));
+    cabecalho.setUint32(0, 0x04034b50, true);
+    cabecalho.setUint16(4, 20, true);
+    cabecalho.setUint16(6, 0x0800, true);   // nomes em UTF-8
+    cabecalho.setUint16(8, 0, true);        // método 0 = guardado
+    cabecalho.setUint16(10, hora, true);
+    cabecalho.setUint16(12, dia, true);
+    cabecalho.setUint32(14, crc, true);
+    cabecalho.setUint32(18, tam, true);
+    cabecalho.setUint32(22, tam, true);
+    cabecalho.setUint16(26, nome.length, true);
+    cabecalho.setUint16(28, 0, true);
+
+    partes.push(new Uint8Array(cabecalho.buffer), nome, arq.dados);
+
+    const dir = new DataView(new ArrayBuffer(46));
+    dir.setUint32(0, 0x02014b50, true);
+    dir.setUint16(4, 20, true);
+    dir.setUint16(6, 20, true);
+    dir.setUint16(8, 0x0800, true);
+    dir.setUint16(10, 0, true);
+    dir.setUint16(12, hora, true);
+    dir.setUint16(14, dia, true);
+    dir.setUint32(16, crc, true);
+    dir.setUint32(20, tam, true);
+    dir.setUint32(24, tam, true);
+    dir.setUint16(28, nome.length, true);
+    dir.setUint16(30, 0, true);
+    dir.setUint16(32, 0, true);
+    dir.setUint16(34, 0, true);
+    dir.setUint16(36, 0, true);
+    dir.setUint32(38, 0, true);
+    dir.setUint32(42, deslocamento, true);
+    central.push(new Uint8Array(dir.buffer), nome);
+
+    deslocamento += 30 + nome.length + tam;
+  });
+
+  const tamanhoCentral = central.reduce((s,p) => s + p.length, 0);
+  const fim = new DataView(new ArrayBuffer(22));
+  fim.setUint32(0, 0x06054b50, true);
+  fim.setUint16(8, arquivos.length, true);
+  fim.setUint16(10, arquivos.length, true);
+  fim.setUint32(12, tamanhoCentral, true);
+  fim.setUint32(16, deslocamento, true);
+  fim.setUint16(20, 0, true);
+
+  return new Blob([...partes, ...central, new Uint8Array(fim.buffer)], { type:'application/zip' });
+}
+
+$('#btnZip').addEventListener('click', async () => {
+  if(!despesas.length) return mostrarAviso('Não há despesas para exportar.','erro');
+  const btn = $('#btnZip');
+  btn.disabled = true;
+  const rotulo = btn.textContent;
+  btn.textContent = 'Montando o pacote…';
+  try{
+    const codificador = new TextEncoder();
+    const arquivos = [
+      { nome:'despesas.csv',  dados: codificador.encode(montarCSV()) },
+      { nome:'despesas.json', dados: codificador.encode(montarJSON()) }
+    ];
+    let faltando = 0;
+    const lista = ordenadas();
+    for(let i=0;i<lista.length;i++){
+      const d = lista[i];
+      if(!d.temComprovante) continue;
+      const blob = await BD.ler(chaveFoto(d.id));
+      if(!blob){ faltando++; continue; }
+      arquivos.push({
+        nome: 'comprovantes/' + nomeArquivoComprovante(d, i+1),
+        dados: new Uint8Array(await blob.arrayBuffer())
+      });
+    }
+    baixar(montarZip(arquivos), nomeBase() + '.zip');
+    mostrarAviso(faltando ? `Pacote pronto (${faltando} comprovante(s) não estavam mais no aparelho).` : 'Pacote pronto.', faltando ? 'info' : 'ok');
+  }catch(e){
+    console.error(e);
+    mostrarAviso('Não consegui montar o pacote: ' + (e.message || e),'erro',8);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = rotulo;
+  }
+});
+
+/* ---------- Roteiro de digitação ---------- */
+$('#btnRoteiro').addEventListener('click', () => {
+  const pendentes = ordenadas().filter(d => !d.lancado);
+  const corpo = $('#corpoRoteiro');
+  if(!pendentes.length){
+    corpo.innerHTML = `<div class="vazio">Tudo lançado. 🎉</div>`;
+  }else{
+    corpo.innerHTML = pendentes.map((d,i) => {
+      const campos = camposParaLancar(d);
+      const linhaUnica = campos.map(([r,v]) => `${r}: ${v}`).join(' | ');
+      return `<div style="border:1px solid var(--borda);border-radius:12px;padding:12px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+          <b>${i+1}. ${escapar(catPorId(d.categoria).nome)} · ${dataCurta(d.data)}</b>
+          <span>${fmtMoeda(d.valor, d.moeda)}</span>
+        </div>
+        <div style="font-size:.8rem;color:var(--cinza);margin-top:4px">${escapar(d.estabelecimento || '—')}</div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn pequeno" data-copiar="${escapar(linhaUnica)}">Copiar tudo</button>
+          <button class="btn pequeno" data-abrir="${d.id}">Abrir</button>
+          <button class="btn pequeno" data-lancado="${d.id}">Marcar como lançada</button>
+        </div>
+      </div>`;
+    }).join('');
+    corpo.querySelectorAll('[data-copiar]').forEach(b => b.addEventListener('click', () => copiar(b.dataset.copiar, b)));
+    corpo.querySelectorAll('[data-abrir]').forEach(b => b.addEventListener('click', () => {
+      const d = despesas.find(o => o.id === b.dataset.abrir);
+      if(d){ fecharModal($('#modalRoteiro')); fotoPendente = null; abrirDespesa(d); }
+    }));
+    corpo.querySelectorAll('[data-lancado]').forEach(b => b.addEventListener('click', () => {
+      const i = despesas.findIndex(o => o.id === b.dataset.lancado);
+      if(i >= 0){ despesas[i].lancado = true; salvarDespesas(); desenhar(); $('#btnRoteiro').click(); }
+    }));
+  }
+  fecharModal($('#modalExportar'));
+  abrirModal('#modalRoteiro');
+});
+
+/* =========================================================================
+   CONFIGURAÇÕES
+   ========================================================================= */
+$('#btnConfig').addEventListener('click', async () => {
+  $('#fLimiteCafe').value   = fmtNum(config.limites.cafe);
+  $('#fLimiteAlmoco').value = fmtNum(config.limites.almoco);
+  $('#fLimiteJantar').value = fmtNum(config.limites.jantar);
+  $('#fTaxa').value = fmtNum(config.taxa);
+  $('#fRequisicao').value = config.requisicao;
+  $('#fViagem').value = config.viagem;
+  $('#fExigirRequisicao').checked = config.exigirRequisicao;
+  $('#fChave').value = config.chaveApi;
+  $('#fModelo').value = config.modelo;
+  $('#fLerAuto').checked = config.lerAuto;
+  $('#infoArmazenamento').textContent = await textoArmazenamento();
+  abrirModal('#modalConfig');
+});
+
+async function textoArmazenamento(){
+  const partes = [`${despesas.length} despesa(s) neste aparelho.`];
+  try{
+    if(navigator.storage && navigator.storage.estimate){
+      const e = await navigator.storage.estimate();
+      if(e.usage) partes.push(`Ocupando ${(e.usage/1048576).toFixed(1)} MB${e.quota ? ' de ' + (e.quota/1048576).toFixed(0) + ' MB disponíveis' : ''}.`);
+    }
+  }catch(e){}
+  partes.push('Exporte o pacote .zip de tempos em tempos: é o seu backup.');
+  return partes.join(' ');
+}
+
+$('#btnSalvarConfig').addEventListener('click', () => {
+  config.limites.cafe   = paraNumero($('#fLimiteCafe').value)   || CONFIG_PADRAO.limites.cafe;
+  config.limites.almoco = paraNumero($('#fLimiteAlmoco').value) || CONFIG_PADRAO.limites.almoco;
+  config.limites.jantar = paraNumero($('#fLimiteJantar').value) || CONFIG_PADRAO.limites.jantar;
+  config.taxa = paraNumero($('#fTaxa').value) || CONFIG_PADRAO.taxa;
+  config.requisicao = $('#fRequisicao').value.trim();
+  config.viagem = $('#fViagem').value.trim();
+  config.exigirRequisicao = $('#fExigirRequisicao').checked;
+  config.chaveApi = $('#fChave').value.trim();
+  config.modelo = $('#fModelo').value;
+  config.lerAuto = $('#fLerAuto').checked;
+  salvarConfig();
+  fecharModal($('#modalConfig'));
+  atualizarSubtitulo();
+  desenhar();
+  mostrarAviso('Configurações salvas.','ok');
+});
+
+$('#btnCotacao').addEventListener('click', async () => {
+  const btn = $('#btnCotacao');
+  btn.disabled = true; btn.textContent = 'Buscando…';
+  try{
+    const r = await fetch('https://open.er-api.com/v6/latest/USD');
+    const d = await r.json();
+    const brl = d?.rates?.BRL;
+    if(!brl) throw new Error('resposta sem BRL');
+    $('#fTaxa').value = fmtNum(brl, 4);
+    $('#infoCotacao').textContent = `Cotação de ${new Date().toLocaleString('pt-BR')}: US$ 1,00 = ${fmtBRL(brl)}. Salve para aplicar às novas despesas.`;
+  }catch(e){
+    $('#infoCotacao').textContent = 'Não consegui buscar a cotação agora (sem internet ou serviço fora do ar). Digite o valor à mão.';
+  }finally{
+    btn.disabled = false; btn.textContent = 'Buscar cotação do dia';
+  }
+});
+
+$('#btnImportar').addEventListener('click', () => $('#entradaImportar').click());
+$('#entradaImportar').addEventListener('change', async ev => {
+  const arquivo = ev.target.files[0];
+  ev.target.value = '';
+  if(!arquivo) return;
+  try{
+    const dados = JSON.parse(await arquivo.text());
+    const lista = Array.isArray(dados) ? dados : dados.despesas;
+    if(!Array.isArray(lista)) throw new Error('arquivo sem lista de despesas');
+    const existentes = new Set(despesas.map(d => d.id));
+    let novas = 0;
+    lista.forEach(d => {
+      const n = normalizarDespesa(d);
+      if(existentes.has(n.id)) return;
+      n.temComprovante = false;   // o .json não carrega as fotos
+      despesas.push(n); novas++;
+    });
+    salvarDespesas();
+    desenhar();
+    mostrarAviso(`${novas} despesa(s) restaurada(s). As fotos não vêm no .json — estão no .zip.`,'ok',7);
+  }catch(e){
+    mostrarAviso('Arquivo inválido: ' + (e.message || e),'erro');
+  }
+});
+
+$('#btnApagarTudo').addEventListener('click', async () => {
+  if(!confirm('Apagar TODAS as despesas e comprovantes deste aparelho? Exporte o .zip antes.')) return;
+  if(!confirm('Confirma? Isso não tem volta.')) return;
+  despesas = [];
+  salvarDespesas();
+  urlsMini.forEach(u => URL.revokeObjectURL(u));
+  urlsMini.clear();
+  try{ await BD.limpar(); }catch(e){}
+  fecharModal($('#modalConfig'));
+  desenhar();
+  mostrarAviso('Tudo apagado.','info');
+});
+
+/* =========================================================================
+   POLÍTICA
+   ========================================================================= */
+$('#btnPolitica').addEventListener('click', () => {
+  $('#corpoPolitica').innerHTML = ['cafe','almoco','jantar'].map(id => {
+    const c = catPorId(id);
+    return `<tr>
+      <td>${c.icone} ${c.nome}</td>
+      <td style="color:var(--cinza)">${fmtUSD(LIMITES_ANTERIORES[id])}</td>
+      <td><b>${fmtUSD(config.limites[id])}</b></td>
+    </tr>`;
+  }).join('');
+  abrirModal('#modalPolitica');
+});
+
+function atualizarSubtitulo(){
+  $('#subtituloViagem').textContent = config.viagem
+    ? config.viagem
+    : 'Limites 2026 · viagem internacional';
+}
+
+/* =========================================================================
+   INÍCIO
+   ========================================================================= */
+atualizarSubtitulo();
+desenhar();
+
+/* Funcionar sem internet: guarda a página para abrir no avião, em roaming ruim,
+   no elevador do hotel. Só roda em contexto seguro (https:// ou localhost). */
+if('serviceWorker' in navigator && window.isSecureContext){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(() => {
+      if(!navigator.serviceWorker.controller && !localStorage.getItem('despesas.offline.avisado')){
+        localStorage.setItem('despesas.offline.avisado','1');
+        mostrarAviso('Pronto: este app agora abre e registra despesas mesmo sem internet.','ok',7);
+      }
+    }).catch(e => console.warn('Service worker não registrado:', e));
+  });
+}
+</script>
+</body>
+</html>
