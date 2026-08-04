@@ -1,13 +1,15 @@
-/* Service worker do Notas.Voz
-   Objetivo: a página abrir e funcionar sem internet (avião, roaming cortado, sinal ruim).
-   Só toma conta dos arquivos do app e das fontes — qualquer outra página do site
+/* Service worker dos apps (Notas.Voz e Despesas)
+   Objetivo: as páginas abrirem e funcionarem sem internet (avião, roaming cortado, sinal ruim).
+   Só toma conta dos arquivos dos apps e das fontes — qualquer outra página do site
    (inclusive a home do Kingston Running Team) passa direto, sem cache. */
 
-const CACHE = 'notasvoz-v2';
+const CACHE = 'apps-v3';
 
 const ARQUIVOS = [
   './notas.html',
   './manifest.webmanifest',
+  './despesas.html',
+  './despesas.webmanifest',
   './icone-192.png',
   './icone-512.png'
 ];
@@ -64,9 +66,10 @@ self.addEventListener('fetch', evento => {
     const resposta = await daRede;
     if (resposta) return resposta;
 
-    // Offline e sem cópia guardada.
+    // Offline e sem cópia guardada: cai para a página do app que estava sendo aberta.
     if (req.mode === 'navigate') {
-      const reserva = await cache.match(new URL('./notas.html', self.location).pathname);
+      const pagina = url.pathname.includes('despesas') ? './despesas.html' : './notas.html';
+      const reserva = await cache.match(new URL(pagina, self.location).pathname);
       if (reserva) return reserva;
     }
     // Fonte indisponível não é problema: o app cai para a fonte do sistema.
