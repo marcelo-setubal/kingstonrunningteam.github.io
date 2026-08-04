@@ -241,6 +241,32 @@ textarea#entrada::placeholder{color:#666}
 /* ---------- Rodapé de ações ---------- */
 .rodape-acoes{display:flex;gap:10px;flex-wrap:wrap;margin:28px 0 10px;padding-top:18px;border-top:1px solid var(--borda)}
 
+/* ---------- Anexos ---------- */
+.captura.arrastando{border-color:var(--vermelho);background:#171010}
+.chips-anexo{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;max-width:100%;
+  background:var(--preto-3);border:1px solid var(--borda);border-radius:9px;
+  padding:6px 8px 6px 9px;font-size:.78rem;color:#ddd;cursor:pointer;transition:.15s;
+}
+.chip:hover{border-color:var(--vermelho)}
+.chip .ico{width:15px;height:15px;flex:none;fill:var(--vermelho)}
+.chip .nome{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+.chip .tam{color:#777;font-size:.7rem;flex:none}
+.chip .tirar{
+  width:18px;height:18px;flex:none;border:0;background:transparent;color:#777;
+  border-radius:5px;display:grid;place-items:center;cursor:pointer;padding:0;
+}
+.chip .tirar:hover{background:var(--vermelho);color:#fff}
+.chip .tirar svg{width:10px;height:10px;fill:currentColor}
+.miniatura{width:26px;height:26px;border-radius:5px;object-fit:cover;flex:none;margin:-3px 0 -3px -3px}
+
+.visor{margin-top:14px;text-align:center}
+.visor img{max-width:100%;max-height:60vh;border-radius:10px}
+.visor iframe{width:100%;height:60vh;border:1px solid var(--borda);border-radius:10px;background:#fff}
+.visor .semvisor{padding:36px 20px;border:1px dashed var(--borda);border-radius:12px;color:#888;font-size:.85rem}
+.visor .semvisor svg{width:40px;height:40px;fill:#444;margin-bottom:10px}
+
 /* ---------- Modal ---------- */
 .fundo-modal{
   position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);
@@ -297,6 +323,10 @@ textarea#entrada::placeholder{color:#666}
         <svg viewBox="0 0 24 24" id="iconeMic"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
       </button>
       <div class="status-gravacao" id="statusGravacao" style="display:none"><span class="ponto"></span><span id="textoGravacao">Ouvindo…</span></div>
+      <button class="btn" id="btnAnexar" title="Anexar PDF, imagem ou qualquer arquivo">
+        <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6h-1.5z"/></svg>
+        Anexar
+      </button>
       <div style="flex:1"></div>
       <label class="interruptor" title="Usa a IA da Anthropic para limpar, resumir e separar em itens/categorias">
         <input type="checkbox" id="usarIA" checked><span class="trilho"></span><span>Organizar com IA</span>
@@ -307,9 +337,11 @@ textarea#entrada::placeholder{color:#666}
       </button>
       <button class="btn fantasma" id="btnLimpar">Limpar</button>
     </div>
+    <div class="chips-anexo" id="chipsPendentes"></div>
     <div class="dica">
       Por voz, diga a <b>categoria primeiro</b> e depois o item: “<i>viagem, passaporte</i>” vira categoria <b>Viagem</b> / item <b>Passaporte</b>.
       Diga <code>feito</code>, <code>em andamento</code> ou <code>pendente</code> para definir o status. Separe vários itens com “<i>e</i>”, vírgula longa ou ponto final.
+      <br>Para anexar o PDF do seguro, uma passagem ou uma foto: toque em <b>Anexar</b>, arraste o arquivo aqui ou cole com <code>Ctrl+V</code>. Depois de criado, o clipe 📎 no item anexa mais arquivos.
     </div>
     <div class="aviso" id="aviso"></div>
   </section>
@@ -350,6 +382,25 @@ textarea#entrada::placeholder{color:#666}
   </div>
 </main>
 
+<input type="file" id="seletorArquivo" multiple style="display:none">
+
+<!-- MODAL VISUALIZAR ANEXO -->
+<div class="fundo-modal" id="modalAnexo">
+  <div class="modal" style="max-width:760px">
+    <h3 id="tituloAnexo">Anexo</h3>
+    <p class="sub" id="subAnexo"></p>
+    <div class="visor" id="visorAnexo"></div>
+    <div class="modal-acoes">
+      <button class="btn fantasma" data-fechar>Fechar</button>
+      <button class="btn fantasma" id="btnBaixarAnexo">
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        Baixar
+      </button>
+      <button class="btn primario" id="btnAbrirAnexo">Abrir em nova aba</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL CONFIGURAÇÃO -->
 <div class="fundo-modal" id="modalConfig">
   <div class="modal">
@@ -380,6 +431,10 @@ textarea#entrada::placeholder{color:#666}
         <option value="en-US">Inglês (EUA)</option>
         <option value="es-ES">Espanhol</option>
       </select>
+    </div>
+    <div class="campo">
+      <label>Armazenamento neste navegador</label>
+      <div class="ajuda" id="infoArmazenamento">—</div>
     </div>
     <div class="modal-acoes">
       <button class="btn fantasma" data-fechar>Cancelar</button>
@@ -413,7 +468,13 @@ textarea#entrada::placeholder{color:#666}
       <p><b style="color:var(--vermelho)">5. IA</b><br>
       Com “Organizar com IA” ligado, o Claude corrige a transcrição, resume o que ficou longo, deduz a categoria certa e separa os itens. Desligado (ou sem chave de API), o app usa uma organização local mais simples.</p>
 
-      <p style="color:#777;font-size:.8rem">Os itens ficam salvos neste navegador. Os áudios ficam guardados localmente (IndexedDB) e nunca são enviados para lugar nenhum.</p>
+      <p><b style="color:var(--vermelho)">6. Anexos</b><br>
+      Toque em <b>Anexar</b> para juntar o PDF do seguro viagem, uma passagem, a foto do passaporte — qualquer arquivo até 30 MB.
+      Também dá para arrastar o arquivo para dentro do quadro ou colar com <code>Ctrl+V</code>.
+      Para anexar em um item que já existe, use o clipe 📎 na linha dele.
+      Toque no anexo para ver: imagens e PDFs abrem ali mesmo, e sempre há os botões <b>Baixar</b> e <b>Abrir em nova aba</b>.</p>
+
+      <p style="color:#777;font-size:.8rem">Os itens ficam salvos neste navegador. Áudios e anexos ficam guardados localmente (IndexedDB) e nunca são enviados para lugar nenhum — nem para o repositório, nem para a IA. Apagar um item apaga os anexos dele.</p>
     </div>
     <div class="modal-acoes"><button class="btn primario" data-fechar>Entendi</button></div>
   </div>
@@ -447,6 +508,7 @@ function carregarItens(){
       .map(i => Object.assign({}, i, {
         status: STATUS[i.status] ? i.status : normalizarStatus(i.status),
         categoria: i.categoria || 'Geral',
+        anexos: Array.isArray(i.anexos) ? i.anexos : [],
         criadoEm: i.criadoEm || 0
       }));
   }catch(e){ return []; }
@@ -473,28 +535,53 @@ const BD = (() => {
     if(promessa) return promessa;
     promessa = new Promise((ok, falha) => {
       if(!('indexedDB' in window)) return falha(new Error('sem indexedDB'));
-      const req = indexedDB.open('notasvoz', 1);
+      const req = indexedDB.open('notasvoz', 2);
       req.onupgradeneeded = () => {
-        if(!req.result.objectStoreNames.contains('audios')) req.result.createObjectStore('audios');
+        const bd = req.result;
+        if(!bd.objectStoreNames.contains('audios')) bd.createObjectStore('audios');
+        if(!bd.objectStoreNames.contains('anexos')){
+          const loja = bd.createObjectStore('anexos', { keyPath:'id' });
+          loja.createIndex('itemId','itemId',{ unique:false });
+        }
       };
       req.onsuccess = () => ok(req.result);
       req.onerror  = () => falha(req.error);
     });
     return promessa;
   }
-  const tx = (modo, fn) => abrir().then(bd => new Promise((ok, falha) => {
-    const t = bd.transaction('audios', modo);
-    const p = fn(t.objectStore('audios'));
+  const tx = (loja, modo, fn) => abrir().then(bd => new Promise((ok, falha) => {
+    const t = bd.transaction(loja, modo);
+    const p = fn(t.objectStore(loja));
     p.onsuccess = () => ok(p.result);
     p.onerror   = () => falha(p.error);
   }));
   return {
-    gravar: (id, blob) => tx('readwrite', s => s.put(blob, id)),
-    ler:    (id)       => tx('readonly',  s => s.get(id)),
-    apagar: (id)       => tx('readwrite', s => s.delete(id)),
-    limpar: ()         => tx('readwrite', s => s.clear())
+    audio:{
+      gravar: (id, blob) => tx('audios','readwrite', s => s.put(blob, id)),
+      ler:    (id)       => tx('audios','readonly',  s => s.get(id)),
+      apagar: (id)       => tx('audios','readwrite', s => s.delete(id))
+    },
+    anexo:{
+      gravar: (reg) => tx('anexos','readwrite', s => s.put(reg)),
+      ler:    (id)  => tx('anexos','readonly',  s => s.get(id)),
+      apagar: (id)  => tx('anexos','readwrite', s => s.delete(id))
+    },
+    limpar: async () => {
+      await tx('audios','readwrite', s => s.clear());
+      await tx('anexos','readwrite', s => s.clear());
+    }
   };
 })();
+
+/* Pede ao navegador para não descartar os dados quando o armazenamento apertar.
+   Importante quando há PDFs de seguro e documentos guardados. */
+async function pedirArmazenamentoPersistente(){
+  try{
+    if(navigator.storage?.persist && !(await navigator.storage.persisted())){
+      await navigator.storage.persist();
+    }
+  }catch(e){}
+}
 
 /* =========================================================================
    UTILITÁRIOS
@@ -519,6 +606,23 @@ function normalizarStatus(s){
   if(['feito','concluido','concluído','pronto','ok','done'].includes(v)) return 'feito';
   if(['andamento','em andamento','fazendo','iniciado','doing'].includes(v)) return 'andamento';
   return 'pendente';
+}
+
+const LIMITE_ANEXO = 30 * 1024 * 1024; // 30 MB por arquivo
+
+function formatarTamanho(b){
+  if(!b && b !== 0) return '';
+  if(b < 1024) return b + ' B';
+  if(b < 1048576) return Math.round(b/1024) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+const ehImagem = tipo => /^image\//.test(tipo || '');
+const ehPdf    = tipo => /pdf/i.test(tipo || '');
+
+function iconeArquivo(tipo){
+  if(ehImagem(tipo)) return '<svg class="ico" viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>';
+  if(ehPdf(tipo))    return '<svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>';
+  return '<svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>';
 }
 
 let tempoAviso;
@@ -720,12 +824,13 @@ async function adicionar(){
     status: n.status || 'pendente',
     fonte: audioPendente ? 'voz' : 'texto',
     temAudio: !!audioPendente && indice === 0,
+    anexos: [],
     criadoEm: agora,
     alteradoEm: agora
   }));
 
   if(audioPendente){
-    try{ await BD.gravar(criados[0].id, audioPendente); }
+    try{ await BD.audio.gravar(criados[0].id, audioPendente); }
     catch(e){ criados[0].temAudio = false; }
     audioPendente = null;
   }
@@ -733,9 +838,184 @@ async function adicionar(){
   itens = criados.concat(itens);
   salvarItens();
   $('#entrada').value = '';
+
+  // Arquivos escolhidos antes de criar o item vão para o primeiro deles.
+  if(anexosPendentes.length){
+    const paraAnexar = anexosPendentes;
+    anexosPendentes = [];
+    desenharChipsPendentes();
+    await anexarAoItem(criados[0].id, paraAnexar);
+  }
+
   desenhar();
   mostrarAviso(`${criados.length} ${criados.length === 1 ? 'item adicionado' : 'itens adicionados'}.`,'ok');
 }
+
+/* =========================================================================
+   ANEXOS (PDF, imagens, qualquer arquivo)
+   ========================================================================= */
+let anexosPendentes = [];   // arquivos escolhidos antes do item existir
+let alvoAnexo = null;       // id do item que vai receber os arquivos (null = novo item)
+
+function desenharChipsPendentes(){
+  const alvo = $('#chipsPendentes');
+  if(!anexosPendentes.length){ alvo.innerHTML = ''; return; }
+  alvo.innerHTML = anexosPendentes.map((a, i) => `
+    <span class="chip" data-pendente="${i}">
+      ${iconeArquivo(a.type)}
+      <span class="nome">${esc(a.name)}</span>
+      <span class="tam">${formatarTamanho(a.size)}</span>
+      <button class="tirar" data-tirar-pendente="${i}" title="Remover">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </span>`).join('');
+}
+
+function pedirArquivos(itemId = null){
+  alvoAnexo = itemId;
+  const seletor = $('#seletorArquivo');
+  seletor.value = '';
+  seletor.click();
+}
+
+$('#seletorArquivo').addEventListener('change', ev => {
+  const arquivos = Array.from(ev.target.files || []);
+  if(arquivos.length) receberArquivos(arquivos, alvoAnexo);
+  alvoAnexo = null;
+});
+
+/* Ponto único de entrada: seletor, arrastar-e-soltar e colar caem todos aqui. */
+async function receberArquivos(arquivos, itemId = null){
+  const validos = [];
+  for(const arq of arquivos){
+    if(arq.size > LIMITE_ANEXO){
+      mostrarAviso(`“${arq.name}” tem ${formatarTamanho(arq.size)} e passa do limite de ${formatarTamanho(LIMITE_ANEXO)}.`,'erro');
+      continue;
+    }
+    validos.push(arq);
+  }
+  if(!validos.length) return;
+
+  pedirArmazenamentoPersistente();
+
+  if(itemId){
+    await anexarAoItem(itemId, validos);
+  }else{
+    anexosPendentes = anexosPendentes.concat(validos);
+    desenharChipsPendentes();
+    mostrarAviso(`${validos.length} arquivo(s) prontos — serão anexados ao item que você adicionar agora.`,'info');
+  }
+}
+
+async function anexarAoItem(itemId, arquivos){
+  const item = acharItem(itemId);
+  if(!item) return;
+  item.anexos = item.anexos || [];
+
+  for(const arq of arquivos){
+    const id = novoId();
+    const registro = {
+      id, itemId,
+      nome: arq.name || 'arquivo',
+      tipo: arq.type || 'application/octet-stream',
+      tamanho: arq.size,
+      criadoEm: Date.now(),
+      blob: arq
+    };
+    try{
+      await BD.anexo.gravar(registro);
+      item.anexos.push({ id, nome:registro.nome, tipo:registro.tipo, tamanho:registro.tamanho });
+    }catch(e){
+      console.error(e);
+      mostrarAviso(`Não consegui guardar “${registro.nome}”. O armazenamento do navegador pode estar cheio.`,'erro');
+    }
+  }
+  item.alteradoEm = Date.now();
+  salvarItens();
+  desenhar();
+}
+
+async function removerAnexo(itemId, anexoId){
+  const item = acharItem(itemId);
+  if(!item) return;
+  item.anexos = (item.anexos || []).filter(a => a.id !== anexoId);
+  try{ await BD.anexo.apagar(anexoId); }catch(e){}
+  salvarItens();
+  desenhar();
+}
+
+async function apagarAnexosDoItem(item){
+  for(const a of (item.anexos || [])){
+    try{ await BD.anexo.apagar(a.id); }catch(e){}
+  }
+}
+
+/* ---- Visualizador ---- */
+let urlAnexoAberto = null;
+
+function liberarAnexoAberto(){
+  if(urlAnexoAberto){ URL.revokeObjectURL(urlAnexoAberto); urlAnexoAberto = null; }
+}
+
+async function abrirAnexo(anexoId){
+  let registro;
+  try{ registro = await BD.anexo.ler(anexoId); }catch(e){}
+  if(!registro || !registro.blob){
+    mostrarAviso('Não encontrei esse arquivo no armazenamento deste navegador.','erro');
+    return;
+  }
+
+  liberarAnexoAberto();
+  urlAnexoAberto = URL.createObjectURL(registro.blob);
+
+  $('#tituloAnexo').textContent = registro.nome;
+  $('#subAnexo').textContent = `${registro.tipo || 'arquivo'} · ${formatarTamanho(registro.tamanho)}`;
+
+  const visor = $('#visorAnexo');
+  if(ehImagem(registro.tipo)){
+    visor.innerHTML = `<img src="${urlAnexoAberto}" alt="${esc(registro.nome)}">`;
+  }else if(ehPdf(registro.tipo)){
+    visor.innerHTML = `<iframe src="${urlAnexoAberto}" title="${esc(registro.nome)}"></iframe>`;
+  }else{
+    visor.innerHTML = `<div class="semvisor">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+      <div>Este tipo de arquivo não abre aqui dentro.<br>Use <b>Baixar</b> ou <b>Abrir em nova aba</b>.</div>
+    </div>`;
+  }
+
+  $('#btnBaixarAnexo').onclick = () => {
+    const a = document.createElement('a');
+    a.href = urlAnexoAberto; a.download = registro.nome; a.click();
+  };
+  $('#btnAbrirAnexo').onclick = () => window.open(urlAnexoAberto, '_blank');
+
+  abrirModal('#modalAnexo');
+}
+
+/* ---- Arrastar-e-soltar e colar ---- */
+const painel = $('#painelCaptura');
+['dragenter','dragover'].forEach(ev => painel.addEventListener(ev, e => {
+  e.preventDefault(); painel.classList.add('arrastando');
+}));
+['dragleave','drop'].forEach(ev => painel.addEventListener(ev, e => {
+  e.preventDefault(); painel.classList.remove('arrastando');
+}));
+painel.addEventListener('drop', e => {
+  const arquivos = Array.from(e.dataTransfer?.files || []);
+  if(arquivos.length) receberArquivos(arquivos);
+});
+document.addEventListener('paste', e => {
+  const arquivos = Array.from(e.clipboardData?.files || []);
+  if(arquivos.length){ e.preventDefault(); receberArquivos(arquivos); }
+});
+
+$('#btnAnexar').addEventListener('click', () => pedirArquivos(null));
+$('#chipsPendentes').addEventListener('click', ev => {
+  const tirar = ev.target.closest('[data-tirar-pendente]');
+  if(!tirar) return;
+  anexosPendentes.splice(Number(tirar.dataset.tirarPendente), 1);
+  desenharChipsPendentes();
+});
 
 /* =========================================================================
    GRAVAÇÃO DE VOZ (reconhecimento + áudio)
@@ -842,7 +1122,13 @@ function itensFiltrados(){
   });
 }
 
+let urlsMiniaturas = [];
+
 function desenhar(){
+  // libera as miniaturas do render anterior para não vazar memória
+  urlsMiniaturas.forEach(u => URL.revokeObjectURL(u));
+  urlsMiniaturas = [];
+
   // números
   $('#numTotal').textContent     = itens.length;
   $('#numPendente').textContent  = itens.filter(i => i.status === 'pendente').length;
@@ -893,16 +1179,30 @@ function desenhar(){
   // carrega os áudios já salvos
   lista.filter(i => i.temAudio).forEach(async i => {
     try{
-      const blob = await BD.ler(i.id);
+      const blob = await BD.audio.ler(i.id);
       if(!blob) return;
       const el = document.querySelector(`[data-audio="${i.id}"]`);
       if(el) el.src = URL.createObjectURL(blob);
+    }catch(e){}
+  });
+
+  // troca o ícone pela miniatura nos anexos que são imagem
+  lista.flatMap(i => i.anexos || []).filter(a => ehImagem(a.tipo)).forEach(async a => {
+    try{
+      const reg = await BD.anexo.ler(a.id);
+      if(!reg || !reg.blob) return;
+      const alvoMini = document.querySelector(`[data-mini="${a.id}"]`);
+      if(!alvoMini) return;
+      const url = URL.createObjectURL(reg.blob);
+      urlsMiniaturas.push(url);
+      alvoMini.innerHTML = `<img class="miniatura" src="${url}" alt="">`;
     }catch(e){}
   });
 }
 
 function desenharItem(i){
   const s = i.status;
+  const anexos = i.anexos || [];
   return `<div class="item ${s}" data-id="${i.id}">
     <button class="caixa-check" data-acao="alternar" title="Mudar status">
       <svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
@@ -913,10 +1213,23 @@ function desenharItem(i){
       <div class="meta">
         <span class="selo ${s}">${STATUS[s].rotulo}</span>
         ${i.fonte === 'voz' ? '<span class="selo fonte">🎙 voz</span>' : ''}
+        ${anexos.length ? `<span class="selo fonte">📎 ${anexos.length}</span>` : ''}
       </div>
       ${i.temAudio ? `<audio class="audio-item" controls preload="none" data-audio="${i.id}"></audio>` : ''}
+      ${anexos.length ? `<div class="chips-anexo">${anexos.map(a => `
+        <span class="chip" data-abrir-anexo="${a.id}" title="Abrir ${esc(a.nome)}">
+          <span data-mini="${a.id}">${iconeArquivo(a.tipo)}</span>
+          <span class="nome">${esc(a.nome)}</span>
+          <span class="tam">${formatarTamanho(a.tamanho)}</span>
+          <button class="tirar" data-tirar-anexo="${a.id}" title="Remover anexo">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </span>`).join('')}</div>` : ''}
     </div>
     <div class="acoes-item">
+      <button data-acao="anexar" title="Anexar arquivo">
+        <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6h-1.5z"/></svg>
+      </button>
       <button data-acao="editar" title="Editar texto">
         <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
       </button>
@@ -933,6 +1246,17 @@ function desenharItem(i){
 function acharItem(id){ return itens.find(i => i.id === id); }
 
 $('#lista').addEventListener('click', async ev => {
+  // anexos primeiro: remover tem prioridade sobre abrir
+  const tirarAnexo = ev.target.closest('[data-tirar-anexo]');
+  if(tirarAnexo){
+    ev.stopPropagation();
+    const linhaAnexo = tirarAnexo.closest('.item');
+    if(confirm('Remover este anexo?')) await removerAnexo(linhaAnexo.dataset.id, tirarAnexo.dataset.tirarAnexo);
+    return;
+  }
+  const abrir = ev.target.closest('[data-abrir-anexo]');
+  if(abrir){ abrirAnexo(abrir.dataset.abrirAnexo); return; }
+
   const botao = ev.target.closest('button[data-acao]');
   if(!botao) return;
   const linha = botao.closest('.item');
@@ -940,6 +1264,8 @@ $('#lista').addEventListener('click', async ev => {
   if(!item) return;
 
   const acao = botao.dataset.acao;
+
+  if(acao === 'anexar'){ pedirArquivos(item.id); return; }
 
   if(acao === 'alternar'){
     item.status = item.status === 'pendente' ? 'andamento'
@@ -971,8 +1297,11 @@ $('#lista').addEventListener('click', async ev => {
   }
 
   if(acao === 'excluir'){
+    const quantos = (item.anexos || []).length;
+    if(quantos && !confirm(`Este item tem ${quantos} anexo(s). Excluir o item apaga os arquivos também. Continuar?`)) return;
     itens = itens.filter(i => i.id !== item.id);
-    if(item.temAudio){ try{ await BD.apagar(item.id); }catch(e){} }
+    if(item.temAudio){ try{ await BD.audio.apagar(item.id); }catch(e){} }
+    await apagarAnexosDoItem(item);
     salvarItens(); desenhar();
   }
 });
@@ -1015,6 +1344,7 @@ $('#btnExportar').addEventListener('click', () => {
          .forEach(i => {
            const marca = i.status === 'feito' ? '[x]' : i.status === 'andamento' ? '[~]' : '[ ]';
            texto += `- ${marca} ${i.titulo}${i.observacao ? ' — ' + i.observacao : ''}\n`;
+           (i.anexos || []).forEach(a => { texto += `  - 📎 ${a.nome} (${formatarTamanho(a.tamanho)})\n`; });
          });
     texto += '\n';
   }
@@ -1027,8 +1357,13 @@ $('#btnExportar').addEventListener('click', () => {
 $('#btnLimparFeitos').addEventListener('click', async () => {
   const feitos = itens.filter(i => i.status === 'feito');
   if(!feitos.length){ mostrarAviso('Nenhum item concluído.','info'); return; }
-  if(!confirm(`Remover ${feitos.length} item(ns) concluído(s)?`)) return;
-  for(const i of feitos){ if(i.temAudio){ try{ await BD.apagar(i.id); }catch(e){} } }
+  const comAnexo = feitos.reduce((n,i) => n + (i.anexos || []).length, 0);
+  const aviso = comAnexo ? ` Isso também apaga ${comAnexo} anexo(s).` : '';
+  if(!confirm(`Remover ${feitos.length} item(ns) concluído(s)?${aviso}`)) return;
+  for(const i of feitos){
+    if(i.temAudio){ try{ await BD.audio.apagar(i.id); }catch(e){} }
+    await apagarAnexosDoItem(i);
+  }
   itens = itens.filter(i => i.status !== 'feito');
   salvarItens(); desenhar();
 });
@@ -1045,12 +1380,27 @@ $('#btnApagarTudo').addEventListener('click', async () => {
    MODAIS
    ========================================================================= */
 function abrirModal(id){ $(id).classList.add('aberto'); }
-function fecharModal(el){ el.classList.remove('aberto'); }
+function fecharModal(el){
+  el.classList.remove('aberto');
+  if(el.id === 'modalAnexo'){ $('#visorAnexo').innerHTML = ''; liberarAnexoAberto(); }
+}
 
-$('#btnConfig').addEventListener('click', () => {
+$('#btnConfig').addEventListener('click', async () => {
   $('#chaveApi').value  = config.chaveApi || '';
   $('#modelo').value    = config.modelo;
   $('#idiomaVoz').value = config.idiomaVoz;
+
+  const totalAnexos = itens.reduce((n,i) => n + (i.anexos || []).length, 0);
+  const bytesAnexos = itens.reduce((n,i) => n + (i.anexos || []).reduce((m,a) => m + (a.tamanho||0), 0), 0);
+  let linha = `${totalAnexos} anexo(s) · ${formatarTamanho(bytesAnexos)}`;
+  try{
+    const est = await navigator.storage?.estimate?.();
+    if(est?.usage != null) linha += ` — uso total do app: ${formatarTamanho(est.usage)}`;
+    if(est?.quota != null) linha += ` de ${formatarTamanho(est.quota)} disponíveis`;
+    if(await navigator.storage?.persisted?.()) linha += '. Armazenamento marcado como persistente ✓';
+  }catch(e){}
+  $('#infoArmazenamento').textContent = linha;
+
   abrirModal('#modalConfig');
 });
 $('#btnAjuda').addEventListener('click', () => abrirModal('#modalAjuda'));

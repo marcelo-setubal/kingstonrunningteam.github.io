@@ -3,7 +3,7 @@
    Só toma conta dos arquivos do app e das fontes — qualquer outra página do site
    (inclusive a home do Kingston Running Team) passa direto, sem cache. */
 
-const CACHE = 'notasvoz-v1';
+const CACHE = 'notasvoz-v2';
 
 const ARQUIVOS = [
   './notas.html',
