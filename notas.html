@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<title>Notas de Voz — Bloco de Notas com Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --preto:#0a0a0a;
+  --preto-2:#121212;
+  --preto-3:#1a1a1a;
+  --borda:#2a2a2a;
+  --branco:#ffffff;
+  --cinza:#9a9a9a;
+  --vermelho:#e10600;
+  --vermelho-claro:#ff3b30;
+  --verde:#25c26e;
+  --ambar:#ffb020;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--preto);
+  color:var(--branco);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:64px;
+}
+.container{width:100%;max-width:960px;margin:0 auto;padding:0 16px}
+
+/* ---------- Cabeçalho ---------- */
+header{
+  border-bottom:1px solid var(--borda);
+  background:linear-gradient(180deg,#141414 0%,var(--preto) 100%);
+  position:sticky;top:0;z-index:40;
+  backdrop-filter:blur(8px);
+}
+.topo{display:flex;align-items:center;gap:14px;padding:16px 0}
+.marca{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.marca .bolha{
+  width:42px;height:42px;border-radius:12px;flex:none;
+  background:var(--vermelho);
+  display:grid;place-items:center;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 8px 20px rgba(225,6,0,.35);
+}
+.marca .bolha svg{width:22px;height:22px;fill:#fff}
+.marca h1{
+  font-family:'Anton',sans-serif;font-weight:400;
+  font-size:1.5rem;letter-spacing:.06em;text-transform:uppercase;
+  margin:0;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.marca h1 span{color:var(--vermelho)}
+.marca p{margin:2px 0 0;font-size:.75rem;color:var(--cinza);letter-spacing:.02em}
+.btn-icone{
+  width:40px;height:40px;flex:none;border-radius:10px;
+  background:var(--preto-3);border:1px solid var(--borda);color:var(--branco);
+  display:grid;place-items:center;cursor:pointer;transition:.15s;
+}
+.btn-icone:hover{border-color:var(--vermelho);color:var(--vermelho)}
+.btn-icone svg{width:18px;height:18px;fill:currentColor}
+
+/* ---------- Captura ---------- */
+.captura{
+  margin-top:20px;background:var(--preto-2);
+  border:1px solid var(--borda);border-radius:16px;padding:16px;
+}
+.captura.gravando{border-color:var(--vermelho);box-shadow:0 0 0 3px rgba(225,6,0,.15)}
+textarea#entrada{
+  width:100%;min-height:84px;resize:vertical;
+  background:transparent;border:0;outline:0;
+  color:var(--branco);font:inherit;font-size:1rem;line-height:1.6;
+}
+textarea#entrada::placeholder{color:#666}
+.linha-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.btn{
+  border:1px solid var(--borda);background:var(--preto-3);color:var(--branco);
+  padding:10px 16px;border-radius:10px;font:inherit;font-weight:600;font-size:.875rem;
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s;
+}
+.btn:hover:not(:disabled){border-color:#4a4a4a;background:#232323}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:16px;height:16px;fill:currentColor}
+.btn.primario{background:var(--vermelho);border-color:var(--vermelho);color:#fff}
+.btn.primario:hover:not(:disabled){background:#ff1a12;border-color:#ff1a12}
+.btn.fantasma{background:transparent}
+
+.btn-mic{
+  width:58px;height:58px;border-radius:50%;flex:none;
+  background:var(--vermelho);border:0;color:#fff;
+  display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 6px 20px rgba(225,6,0,.4);transition:.15s;
+}
+.btn-mic svg{width:24px;height:24px;fill:#fff}
+.btn-mic:hover{transform:scale(1.05)}
+.btn-mic.ativo{animation:pulsa 1.4s infinite;background:#ff1a12}
+@keyframes pulsa{
+  0%{box-shadow:0 0 0 0 rgba(225,6,0,.6)}
+  70%{box-shadow:0 0 0 18px rgba(225,6,0,0)}
+  100%{box-shadow:0 0 0 0 rgba(225,6,0,0)}
+}
+.status-gravacao{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--cinza)}
+.status-gravacao .ponto{width:8px;height:8px;border-radius:50%;background:var(--vermelho);animation:pisca 1s infinite}
+@keyframes pisca{50%{opacity:.2}}
+
+.interruptor{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--cinza);cursor:pointer;user-select:none}
+.interruptor input{display:none}
+.interruptor .trilho{width:38px;height:22px;border-radius:11px;background:#333;position:relative;transition:.2s;flex:none}
+.interruptor .trilho::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#888;transition:.2s}
+.interruptor input:checked + .trilho{background:var(--vermelho)}
+.interruptor input:checked + .trilho::after{left:19px;background:#fff}
+
+.dica{margin-top:10px;font-size:.75rem;color:#6d6d6d;line-height:1.6}
+.dica code{background:var(--preto-3);border:1px solid var(--borda);border-radius:5px;padding:1px 6px;color:#ddd;font-size:.72rem}
+
+/* ---------- Aviso / erro ---------- */
+.aviso{
+  margin-top:12px;padding:10px 14px;border-radius:10px;font-size:.82rem;
+  border:1px solid var(--borda);background:var(--preto-3);color:var(--cinza);
+  display:none;
+}
+.aviso.erro{display:block;border-color:var(--vermelho);color:#ffb3b0;background:rgba(225,6,0,.08)}
+.aviso.ok{display:block;border-color:#2a5f3f;color:#8fe0b4;background:rgba(37,194,110,.08)}
+.aviso.info{display:block}
+
+/* ---------- Painel de números ---------- */
+.painel{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
+.painel .caixa{
+  background:var(--preto-2);border:1px solid var(--borda);border-radius:12px;
+  padding:12px 14px;
+}
+.painel .caixa b{display:block;font-family:'Anton',sans-serif;font-size:1.6rem;line-height:1.1;letter-spacing:.02em}
+.painel .caixa small{display:block;margin-top:2px;font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;color:var(--cinza)}
+.painel .caixa.total b{color:var(--branco)}
+.painel .caixa.pendente b{color:var(--vermelho)}
+.painel .caixa.andamento b{color:var(--ambar)}
+.painel .caixa.feito b{color:var(--verde)}
+
+@media (max-width:560px){
+  .painel{grid-template-columns:repeat(2,1fr)}
+  .marca h1{font-size:1.3rem}
+  .btn-mic{width:52px;height:52px}
+  .linha-acoes{gap:8px}
+}
+
+/* ---------- Filtros ---------- */
+.filtros{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:22px 0 14px}
+.busca{
+  flex:1;min-width:180px;display:flex;align-items:center;gap:8px;
+  background:var(--preto-2);border:1px solid var(--borda);border-radius:10px;padding:0 12px;
+}
+.busca svg{width:15px;height:15px;fill:var(--cinza);flex:none}
+.busca input{flex:1;background:transparent;border:0;outline:0;color:var(--branco);font:inherit;font-size:.875rem;padding:10px 0}
+.busca input::placeholder{color:#666}
+.pilulas{display:flex;gap:6px;flex-wrap:wrap}
+.pilula{
+  border:1px solid var(--borda);background:var(--preto-2);color:var(--cinza);
+  padding:8px 14px;border-radius:999px;font:inherit;font-size:.78rem;font-weight:600;
+  cursor:pointer;transition:.15s;white-space:nowrap;
+}
+.pilula:hover{color:var(--branco)}
+.pilula.ativa{background:var(--vermelho);border-color:var(--vermelho);color:#fff}
+
+/* ---------- Lista ---------- */
+.categoria{margin-bottom:26px}
+.cabecalho-categoria{
+  display:flex;align-items:center;gap:10px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px solid var(--borda);
+}
+.cabecalho-categoria h2{
+  font-family:'Anton',sans-serif;font-weight:400;font-size:1.05rem;
+  letter-spacing:.08em;text-transform:uppercase;margin:0;
+}
+.cabecalho-categoria .barra{width:4px;height:18px;background:var(--vermelho);border-radius:2px;flex:none}
+.cabecalho-categoria .contagem{
+  margin-left:auto;font-size:.7rem;color:var(--cinza);
+  border:1px solid var(--borda);border-radius:999px;padding:2px 10px;
+}
+
+.item{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--preto-2);border:1px solid var(--borda);border-radius:12px;
+  padding:13px 14px;margin-bottom:8px;transition:.15s;
+}
+.item:hover{border-color:#3a3a3a}
+.item.feito{opacity:.62}
+.item.feito .titulo{text-decoration:line-through;text-decoration-color:var(--vermelho)}
+
+.caixa-check{
+  width:22px;height:22px;flex:none;margin-top:1px;border-radius:6px;
+  border:2px solid #444;background:transparent;cursor:pointer;
+  display:grid;place-items:center;transition:.15s;padding:0;position:relative;
+}
+.caixa-check:hover{border-color:var(--vermelho)}
+.caixa-check svg{width:12px;height:12px;fill:#fff;opacity:0;transition:.15s}
+.item.feito .caixa-check{background:var(--verde);border-color:var(--verde)}
+.item.feito .caixa-check svg{opacity:1}
+.item.andamento .caixa-check{border-color:var(--ambar)}
+.item.andamento .caixa-check::after{content:"";width:9px;height:9px;border-radius:2px;background:var(--ambar);position:absolute}
+
+.corpo{flex:1;min-width:0}
+.titulo{font-weight:600;font-size:.95rem;word-wrap:break-word}
+.titulo[contenteditable="true"]{outline:1px solid var(--vermelho);border-radius:4px;padding:2px 4px;margin:-2px -4px}
+.obs{margin-top:3px;font-size:.82rem;color:var(--cinza);word-wrap:break-word}
+.meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+.selo{
+  font-size:.66rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px;border:1px solid;
+}
+.selo.pendente{color:var(--vermelho-claro);border-color:rgba(255,59,48,.45);background:rgba(225,6,0,.1)}
+.selo.andamento{color:var(--ambar);border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.1)}
+.selo.feito{color:var(--verde);border-color:rgba(37,194,110,.45);background:rgba(37,194,110,.1)}
+.selo.fonte{color:var(--cinza);border-color:var(--borda);background:transparent}
+.audio-item{margin-top:8px;width:100%;max-width:320px;height:32px;display:block}
+
+.acoes-item{display:flex;gap:4px;flex:none;align-items:center}
+.acoes-item button{
+  width:30px;height:30px;border-radius:8px;border:1px solid transparent;background:transparent;
+  color:#777;display:grid;place-items:center;cursor:pointer;transition:.15s;padding:0;
+}
+.acoes-item button:hover{color:var(--branco);border-color:var(--borda);background:var(--preto-3)}
+.acoes-item button.excluir:hover{color:var(--vermelho);border-color:var(--vermelho)}
+.acoes-item svg{width:15px;height:15px;fill:currentColor}
+
+.vazio{
+  text-align:center;padding:56px 20px;color:#666;
+  border:1px dashed var(--borda);border-radius:16px;
+}
+.vazio svg{width:44px;height:44px;fill:#333;margin-bottom:12px}
+.vazio p{margin:0;font-size:.9rem}
+
+/* ---------- Rodapé de ações ---------- */
+.rodape-acoes{display:flex;gap:10px;flex-wrap:wrap;margin:28px 0 10px;padding-top:18px;border-top:1px solid var(--borda)}
+
+/* ---------- Modal ---------- */
+.fundo-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;padding:16px;z-index:100;
+}
+.fundo-modal.aberto{display:flex}
+.modal{
+  width:100%;max-width:520px;max-height:85vh;overflow-y:auto;
+  background:var(--preto-2);border:1px solid var(--borda);border-radius:16px;padding:22px;
+}
+.modal h3{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.05em;text-transform:uppercase;font-size:1.15rem;margin:0 0 4px}
+.modal .sub{color:var(--cinza);font-size:.82rem;margin:0 0 18px}
+.campo{margin-bottom:16px}
+.campo label{display:block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--cinza);margin-bottom:6px}
+.campo input,.campo select{
+  width:100%;background:var(--preto);border:1px solid var(--borda);border-radius:9px;
+  padding:11px 12px;color:var(--branco);font:inherit;font-size:.875rem;outline:0;
+}
+.campo input:focus,.campo select:focus{border-color:var(--vermelho)}
+.campo .ajuda{font-size:.72rem;color:#6d6d6d;margin-top:6px;line-height:1.55}
+.campo .ajuda a{color:var(--vermelho-claro)}
+.modal-acoes{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container topo">
+    <div class="marca">
+      <div class="bolha">
+        <svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+      </div>
+      <div>
+        <h1>Notas<span>.</span>Voz</h1>
+        <p>Checklist por voz com organização por IA</p>
+      </div>
+    </div>
+    <button class="btn-icone" id="btnAjuda" title="Como usar">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm1.8-6.7-.9.92C13.2 11.9 13 12.4 13 14h-2v-.5c0-1.1.4-2.1 1.2-2.83l1.24-1.26A2 2 0 1 0 10 8H8a4 4 0 1 1 6.8 2.3z"/></svg>
+    </button>
+    <button class="btn-icone" id="btnConfig" title="Configurar IA">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94a7.6 7.6 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.62l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.24-1.13.55-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.65 8.86a.5.5 0 0 0 .12.62l2.03 1.58a7.6 7.6 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.62l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.39 1.05.7 1.63.94l.36 2.54c.04.24.25.42.5.42h3.84c.25 0 .46-.18.5-.42l.36-2.54c.58-.24 1.13-.55 1.63-.94l2.39.96c.22.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.62l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- CAPTURA -->
+  <section class="captura" id="painelCaptura">
+    <textarea id="entrada" placeholder="Fale ou escreva aqui…  Ex.: “Viagem, passaporte. Viagem, comprar adaptador de tomada — em andamento. Casa, trocar lâmpada da sala, feito.”"></textarea>
+    <div class="linha-acoes">
+      <button class="btn-mic" id="btnMic" title="Gravar áudio (clique para iniciar e clique de novo para parar)">
+        <svg viewBox="0 0 24 24" id="iconeMic"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+      </button>
+      <div class="status-gravacao" id="statusGravacao" style="display:none"><span class="ponto"></span><span id="textoGravacao">Ouvindo…</span></div>
+      <div style="flex:1"></div>
+      <label class="interruptor" title="Usa a IA da Anthropic para limpar, resumir e separar em itens/categorias">
+        <input type="checkbox" id="usarIA" checked><span class="trilho"></span><span>Organizar com IA</span>
+      </label>
+      <button class="btn primario" id="btnAdicionar">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        Adicionar
+      </button>
+      <button class="btn fantasma" id="btnLimpar">Limpar</button>
+    </div>
+    <div class="dica">
+      Por voz, diga a <b>categoria primeiro</b> e depois o item: “<i>viagem, passaporte</i>” vira categoria <b>Viagem</b> / item <b>Passaporte</b>.
+      Diga <code>feito</code>, <code>em andamento</code> ou <code>pendente</code> para definir o status. Separe vários itens com “<i>e</i>”, vírgula longa ou ponto final.
+    </div>
+    <div class="aviso" id="aviso"></div>
+  </section>
+
+  <!-- NÚMEROS -->
+  <section class="painel">
+    <div class="caixa total"><b id="numTotal">0</b><small>Total</small></div>
+    <div class="caixa pendente"><b id="numPendente">0</b><small>Pendente</small></div>
+    <div class="caixa andamento"><b id="numAndamento">0</b><small>Em andamento</small></div>
+    <div class="caixa feito"><b id="numFeito">0</b><small>Feito</small></div>
+  </section>
+
+  <!-- FILTROS -->
+  <section class="filtros">
+    <div class="busca">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+      <input type="search" id="busca" placeholder="Buscar item ou categoria…">
+    </div>
+    <div class="pilulas" id="pilulasStatus">
+      <button class="pilula ativa" data-status="todos">Todos</button>
+      <button class="pilula" data-status="pendente">Pendente</button>
+      <button class="pilula" data-status="andamento">Em andamento</button>
+      <button class="pilula" data-status="feito">Feito</button>
+    </div>
+    <div class="pilulas" id="pilulasCategoria"></div>
+  </section>
+
+  <!-- LISTA -->
+  <section id="lista"></section>
+
+  <div class="rodape-acoes">
+    <button class="btn fantasma" id="btnExportar">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Exportar
+    </button>
+    <button class="btn fantasma" id="btnLimparFeitos">Remover concluídos</button>
+    <button class="btn fantasma" id="btnApagarTudo" style="color:#ff6b66">Apagar tudo</button>
+  </div>
+</main>
+
+<!-- MODAL CONFIGURAÇÃO -->
+<div class="fundo-modal" id="modalConfig">
+  <div class="modal">
+    <h3>Configurar IA</h3>
+    <p class="sub">A IA do Claude limpa, resume e separa o que você falou em itens e categorias.</p>
+    <div class="campo">
+      <label for="chaveApi">Chave da API Anthropic</label>
+      <input type="password" id="chaveApi" placeholder="sk-ant-…" autocomplete="off">
+      <div class="ajuda">
+        A chave fica salva <b>somente neste navegador</b> (localStorage) e é enviada apenas para <code>api.anthropic.com</code>.
+        Gere a sua em <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.
+        Sem chave, o app continua funcionando com a organização automática local (mais simples).
+      </div>
+    </div>
+    <div class="campo">
+      <label for="modelo">Modelo</label>
+      <select id="modelo">
+        <option value="claude-opus-5">Claude Opus 5 (melhor qualidade)</option>
+        <option value="claude-sonnet-5">Claude Sonnet 5 (mais rápido/barato)</option>
+        <option value="claude-haiku-4-5">Claude Haiku 4.5 (o mais econômico)</option>
+      </select>
+    </div>
+    <div class="campo">
+      <label for="idiomaVoz">Idioma do reconhecimento de voz</label>
+      <select id="idiomaVoz">
+        <option value="pt-BR">Português (Brasil)</option>
+        <option value="pt-PT">Português (Portugal)</option>
+        <option value="en-US">Inglês (EUA)</option>
+        <option value="es-ES">Espanhol</option>
+      </select>
+    </div>
+    <div class="modal-acoes">
+      <button class="btn fantasma" data-fechar>Cancelar</button>
+      <button class="btn primario" id="btnSalvarConfig">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AJUDA -->
+<div class="fundo-modal" id="modalAjuda">
+  <div class="modal">
+    <h3>Como usar</h3>
+    <p class="sub">Tudo funciona por voz — a IA cuida do resto.</p>
+    <div style="font-size:.88rem;line-height:1.75;color:#ccc">
+      <p><b style="color:var(--vermelho)">1. Grave</b><br>
+      Toque no botão vermelho do microfone e fale normalmente. O texto aparece na tela enquanto você fala, e o áudio fica anexado ao item para você ouvir depois.</p>
+
+      <p><b style="color:var(--vermelho)">2. Categoria por voz</b><br>
+      Diga a categoria antes do item, separada por vírgula:<br>
+      “<i>viagem, passaporte</i>” → categoria <b>Viagem</b>, item <b>Passaporte</b>.<br>
+      Também funciona: “<i>categoria trabalho: enviar relatório</i>”.<br>
+      Se você não disser categoria, o item vai para <b>Geral</b>.</p>
+
+      <p><b style="color:var(--vermelho)">3. Status por voz</b><br>
+      Termine o item com <code>feito</code> / <code>concluído</code>, <code>em andamento</code> / <code>fazendo</code>, ou <code>pendente</code>.
+      Sem isso, o item entra como <b>Pendente</b>.</p>
+
+      <p><b style="color:var(--vermelho)">4. Vários itens de uma vez</b><br>
+      “<i>Viagem, passaporte. Viagem, comprar adaptador, em andamento. Mercado, café e leite.</i>” cria quatro itens em duas categorias.</p>
+
+      <p><b style="color:var(--vermelho)">5. IA</b><br>
+      Com “Organizar com IA” ligado, o Claude corrige a transcrição, resume o que ficou longo, deduz a categoria certa e separa os itens. Desligado (ou sem chave de API), o app usa uma organização local mais simples.</p>
+
+      <p style="color:#777;font-size:.8rem">Os itens ficam salvos neste navegador. Os áudios ficam guardados localmente (IndexedDB) e nunca são enviados para lugar nenhum.</p>
+    </div>
+    <div class="modal-acoes"><button class="btn primario" data-fechar>Entendi</button></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   ESTADO E PERSISTÊNCIA
+   ========================================================================= */
+const CHAVE_ITENS  = 'notasvoz.itens.v1';
+const CHAVE_CONFIG = 'notasvoz.config.v1';
+
+const STATUS = {
+  pendente:  { rotulo:'Pendente',     ordem:0 },
+  andamento: { rotulo:'Em andamento', ordem:1 },
+  feito:     { rotulo:'Feito',        ordem:2 }
+};
+
+let itens  = carregarItens();
+let config = carregarConfig();
+let filtroStatus = 'todos';
+let filtroCategoria = 'todas';
+let termoBusca = '';
+
+function carregarItens(){
+  try{
+    const bruto = JSON.parse(localStorage.getItem(CHAVE_ITENS) || '[]');
+    if(!Array.isArray(bruto)) return [];
+    return bruto
+      .filter(i => i && i.id && i.titulo)
+      .map(i => Object.assign({}, i, {
+        status: STATUS[i.status] ? i.status : normalizarStatus(i.status),
+        categoria: i.categoria || 'Geral',
+        criadoEm: i.criadoEm || 0
+      }));
+  }catch(e){ return []; }
+}
+function salvarItens(){
+  try{ localStorage.setItem(CHAVE_ITENS, JSON.stringify(itens)); }
+  catch(e){ mostrarAviso('Não foi possível salvar (armazenamento cheio).','erro'); }
+}
+function carregarConfig(){
+  const padrao = { chaveApi:'', modelo:'claude-opus-5', idiomaVoz:'pt-BR' };
+  try{ return Object.assign(padrao, JSON.parse(localStorage.getItem(CHAVE_CONFIG) || '{}')); }
+  catch(e){ return padrao; }
+}
+function salvarConfig(){
+  localStorage.setItem(CHAVE_CONFIG, JSON.stringify(config));
+}
+
+/* =========================================================================
+   ÁUDIO (IndexedDB) — guarda os áudios sem estourar o localStorage
+   ========================================================================= */
+const BD = (() => {
+  let promessa = null;
+  function abrir(){
+    if(promessa) return promessa;
+    promessa = new Promise((ok, falha) => {
+      if(!('indexedDB' in window)) return falha(new Error('sem indexedDB'));
+      const req = indexedDB.open('notasvoz', 1);
+      req.onupgradeneeded = () => {
+        if(!req.result.objectStoreNames.contains('audios')) req.result.createObjectStore('audios');
+      };
+      req.onsuccess = () => ok(req.result);
+      req.onerror  = () => falha(req.error);
+    });
+    return promessa;
+  }
+  const tx = (modo, fn) => abrir().then(bd => new Promise((ok, falha) => {
+    const t = bd.transaction('audios', modo);
+    const p = fn(t.objectStore('audios'));
+    p.onsuccess = () => ok(p.result);
+    p.onerror   = () => falha(p.error);
+  }));
+  return {
+    gravar: (id, blob) => tx('readwrite', s => s.put(blob, id)),
+    ler:    (id)       => tx('readonly',  s => s.get(id)),
+    apagar: (id)       => tx('readwrite', s => s.delete(id)),
+    limpar: ()         => tx('readwrite', s => s.clear())
+  };
+})();
+
+/* =========================================================================
+   UTILITÁRIOS
+   ========================================================================= */
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+const novoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+function esc(txt){
+  return String(txt ?? '').replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+}
+function capitalizar(txt){
+  const t = String(txt || '').trim();
+  if(!t) return '';
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+function normalizarStatus(s){
+  const v = String(s || '').toLowerCase().trim();
+  if(['feito','concluido','concluído','pronto','ok','done'].includes(v)) return 'feito';
+  if(['andamento','em andamento','fazendo','iniciado','doing'].includes(v)) return 'andamento';
+  return 'pendente';
+}
+
+let tempoAviso;
+function mostrarAviso(msg, tipo='info'){
+  const el = $('#aviso');
+  el.className = 'aviso ' + tipo;
+  el.textContent = msg;
+  clearTimeout(tempoAviso);
+  if(tipo !== 'erro') tempoAviso = setTimeout(() => { el.className = 'aviso'; }, 5000);
+}
+function esconderAviso(){ $('#aviso').className = 'aviso'; }
+
+/* =========================================================================
+   ORGANIZAÇÃO LOCAL (sem IA) — usada como reserva
+   ========================================================================= */
+const PALAVRAS_STATUS = [
+  [/\b(j[áa]\s+)?(feito|feita|conclu[íi]d[oa]|pronto|prontinho|finalizad[oa]|ok)\b/i, 'feito'],
+  [/\b(em\s+andamento|andamento|fazendo|em\s+progresso|iniciad[oa]|comecei|comecado|come[çc]ado)\b/i, 'andamento'],
+  [/\b(pendente|a\s+fazer|falta|ainda\s+n[ãa]o)\b/i, 'pendente']
+];
+
+function organizarLocalmente(texto){
+  const blocos = String(texto)
+    .split(/[.;\n]+|\s+\be\b\s+(?=[a-zà-ú])/i)
+    .map(t => t.trim())
+    .filter(t => t.length > 1);
+
+  const resultado = [];
+  for(const bloco of blocos){
+    let trecho = bloco;
+    let status = 'pendente';
+
+    for(const [regex, valor] of PALAVRAS_STATUS){
+      if(regex.test(trecho)){ status = valor; trecho = trecho.replace(regex, '').trim(); break; }
+    }
+    trecho = trecho.replace(/[,\-–—\s]+$/,'').trim();
+
+    let categoria = 'Geral';
+    let titulo = trecho;
+
+    // "categoria trabalho: enviar relatório"
+    const comRotulo = trecho.match(/^categoria\s+([^:,]{2,30})\s*[:,]\s*(.+)$/i);
+    if(comRotulo){
+      categoria = capitalizar(comRotulo[1].trim());
+      titulo    = comRotulo[2].trim();
+    }else{
+      // "viagem, passaporte"
+      const porVirgula = trecho.match(/^([^,]{2,28}),\s*(.+)$/);
+      if(porVirgula && porVirgula[1].trim().split(/\s+/).length <= 3){
+        categoria = capitalizar(porVirgula[1].trim());
+        titulo    = porVirgula[2].trim();
+      }
+    }
+    titulo = capitalizar(titulo.replace(/^[,\-–—:\s]+/,'').trim());
+    if(titulo) resultado.push({ titulo, categoria, status, observacao:'' });
+  }
+
+  if(!resultado.length){
+    const t = capitalizar(String(texto).trim());
+    if(t) resultado.push({ titulo:t, categoria:'Geral', status:'pendente', observacao:'' });
+  }
+  return resultado;
+}
+
+/* =========================================================================
+   ORGANIZAÇÃO COM IA (Claude / API Anthropic)
+   ========================================================================= */
+const INSTRUCAO_SISTEMA = `Você organiza anotações faladas em português em uma lista de tarefas (checklist).
+
+A entrada é a transcrição bruta de um áudio: pode ter erros de reconhecimento, repetições, hesitações ("é", "então", "ãã") e frases longas. Converta isso em itens curtos e acionáveis.
+
+Regras:
+1. Separe a fala em vários itens quando houver mais de uma tarefa. Uma tarefa por item.
+2. CATEGORIA: quando a pessoa disser um assunto seguido do item (ex.: "viagem, passaporte"), o primeiro é a categoria ("Viagem") e o segundo é o item ("Passaporte"). Também respeite "categoria X:". Se não houver categoria dita, deduza uma curta e óbvia a partir do conteúdo (ex.: Casa, Trabalho, Mercado, Saúde, Estudos, Financeiro). Use "Geral" só quando nada se encaixar. Categoria: 1–2 palavras, primeira letra maiúscula, sempre no singular.
+3. STATUS: "feito", "concluído", "pronto", "já fiz" → feito. "em andamento", "fazendo", "comecei" → andamento. Caso contrário → pendente.
+4. TÍTULO: corrija erros de transcrição, remova hesitações e escreva no imperativo curto (máx. ~60 caracteres). Ex.: "comprar adaptador de tomada".
+5. OBSERVAÇÃO: se a pessoa deu detalhes relevantes (prazo, valor, local, contato), resuma-os em uma frase curta. Caso contrário, deixe vazio.
+6. Não invente tarefas que não foram ditas. Não repita a mesma tarefa duas vezes.
+7. Responda apenas com o JSON no formato pedido.`;
+
+const ESQUEMA = {
+  type:'object',
+  properties:{
+    itens:{
+      type:'array',
+      items:{
+        type:'object',
+        properties:{
+          titulo:     { type:'string', description:'Tarefa curta no imperativo, já corrigida.' },
+          categoria:  { type:'string', description:'Categoria em 1–2 palavras, singular, capitalizada.' },
+          status:     { type:'string', enum:['pendente','andamento','feito'] },
+          observacao: { type:'string', description:'Detalhe resumido, ou string vazia.' }
+        },
+        required:['titulo','categoria','status','observacao'],
+        additionalProperties:false
+      }
+    }
+  },
+  required:['itens'],
+  additionalProperties:false
+};
+
+async function organizarComIA(texto, categoriasExistentes){
+  const contexto = categoriasExistentes.length
+    ? `\n\nCategorias que já existem na lista (reutilize quando fizer sentido, em vez de criar parecidas): ${categoriasExistentes.join(', ')}.`
+    : '';
+
+  // "effort" existe nos modelos da família 5 / Opus 4.x; o Haiku 4.5 rejeita o parâmetro.
+  const configSaida = { format:{ type:'json_schema', schema: ESQUEMA } };
+  if(!/haiku/i.test(config.modelo)) configSaida.effort = 'low';
+
+  const resposta = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-api-key': config.chaveApi,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body: JSON.stringify({
+      model: config.modelo,
+      max_tokens: 4000,
+      system: INSTRUCAO_SISTEMA + contexto,
+      output_config: configSaida,
+      messages:[{ role:'user', content:`Transcrição do áudio:\n"""${texto}"""` }]
+    })
+  });
+
+  if(!resposta.ok){
+    let detalhe = '';
+    try{ const erro = await resposta.json(); detalhe = erro?.error?.message || ''; }catch(e){}
+    if(resposta.status === 401) throw new Error('Chave da API inválida. Confira em Configurar IA.');
+    if(resposta.status === 429) throw new Error('Limite de uso da API atingido. Tente de novo em instantes.');
+    throw new Error(`Erro ${resposta.status} da API${detalhe ? ': ' + detalhe : ''}`);
+  }
+
+  const dados = await resposta.json();
+  if(dados.stop_reason === 'refusal') throw new Error('A IA recusou processar este conteúdo.');
+
+  const bloco = (dados.content || []).find(b => b.type === 'text');
+  if(!bloco) throw new Error('Resposta vazia da IA.');
+
+  const analisado = JSON.parse(bloco.text);
+  const lista = Array.isArray(analisado.itens) ? analisado.itens : [];
+
+  return lista
+    .filter(i => i && String(i.titulo || '').trim())
+    .map(i => ({
+      titulo:     capitalizar(String(i.titulo).trim()).slice(0,140),
+      categoria:  capitalizar(String(i.categoria || 'Geral').trim()).slice(0,40) || 'Geral',
+      status:     normalizarStatus(i.status),
+      observacao: String(i.observacao || '').trim().slice(0,300)
+    }));
+}
+
+/* =========================================================================
+   ADICIONAR ITENS
+   ========================================================================= */
+let audioPendente = null; // Blob do áudio da última gravação, anexado ao próximo item
+
+async function adicionar(){
+  const texto = $('#entrada').value.trim();
+  if(!texto){ mostrarAviso('Grave um áudio ou escreva algo primeiro.','erro'); return; }
+
+  const btn = $('#btnAdicionar');
+  const usarIA = $('#usarIA').checked && !!config.chaveApi;
+  let novos;
+
+  btn.disabled = true;
+  if(usarIA){
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2z"/></svg> Organizando…';
+    mostrarAviso('A IA está organizando o que você falou…','info');
+    try{
+      novos = await organizarComIA(texto, categoriasAtuais());
+      esconderAviso();
+    }catch(erro){
+      console.error(erro);
+      novos = organizarLocalmente(texto);
+      mostrarAviso(erro.message + ' — os itens foram adicionados sem a IA.','erro');
+    }
+  }else{
+    novos = organizarLocalmente(texto);
+    if($('#usarIA').checked && !config.chaveApi){
+      mostrarAviso('Sem chave de API: usando a organização local. Configure a IA na engrenagem ⚙︎ para melhores resultados.','info');
+    }
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> Adicionar';
+
+  if(!novos.length){ mostrarAviso('Não consegui identificar nenhuma tarefa nesse texto.','erro'); return; }
+
+  const agora = Date.now();
+  const criados = novos.map((n, indice) => ({
+    id: novoId(),
+    titulo: n.titulo,
+    observacao: n.observacao || '',
+    categoria: n.categoria || 'Geral',
+    status: n.status || 'pendente',
+    fonte: audioPendente ? 'voz' : 'texto',
+    temAudio: !!audioPendente && indice === 0,
+    criadoEm: agora,
+    alteradoEm: agora
+  }));
+
+  if(audioPendente){
+    try{ await BD.gravar(criados[0].id, audioPendente); }
+    catch(e){ criados[0].temAudio = false; }
+    audioPendente = null;
+  }
+
+  itens = criados.concat(itens);
+  salvarItens();
+  $('#entrada').value = '';
+  desenhar();
+  mostrarAviso(`${criados.length} ${criados.length === 1 ? 'item adicionado' : 'itens adicionados'}.`,'ok');
+}
+
+/* =========================================================================
+   GRAVAÇÃO DE VOZ (reconhecimento + áudio)
+   ========================================================================= */
+const ReconhecimentoVoz = window.SpeechRecognition || window.webkitSpeechRecognition;
+let reconhecimento = null;
+let gravadorMidia  = null;
+let fluxoMidia     = null;
+let pedacosAudio   = [];
+let gravando       = false;
+let textoBase      = '';
+
+async function alternarGravacao(){
+  if(gravando){ pararGravacao(); return; }
+  await iniciarGravacao();
+}
+
+async function iniciarGravacao(){
+  esconderAviso();
+  textoBase = $('#entrada').value ? $('#entrada').value.trimEnd() + ' ' : '';
+  pedacosAudio = [];
+  audioPendente = null;
+
+  // 1) Gravar o áudio (para poder ouvir depois)
+  try{
+    fluxoMidia = await navigator.mediaDevices.getUserMedia({ audio:true });
+    gravadorMidia = new MediaRecorder(fluxoMidia);
+    gravadorMidia.ondataavailable = ev => { if(ev.data.size) pedacosAudio.push(ev.data); };
+    gravadorMidia.onstop = () => {
+      if(pedacosAudio.length){
+        audioPendente = new Blob(pedacosAudio, { type: gravadorMidia.mimeType || 'audio/webm' });
+      }
+      if(fluxoMidia){ fluxoMidia.getTracks().forEach(t => t.stop()); fluxoMidia = null; }
+    };
+    gravadorMidia.start();
+  }catch(e){
+    mostrarAviso('Não consegui acessar o microfone. Autorize o acesso no navegador.','erro');
+    return;
+  }
+
+  // 2) Transcrever em tempo real (quando o navegador suportar)
+  if(ReconhecimentoVoz){
+    reconhecimento = new ReconhecimentoVoz();
+    reconhecimento.lang = config.idiomaVoz || 'pt-BR';
+    reconhecimento.continuous = true;
+    reconhecimento.interimResults = true;
+
+    reconhecimento.onresult = ev => {
+      let definitivo = '', parcial = '';
+      for(let i = 0; i < ev.results.length; i++){
+        const t = ev.results[i][0].transcript;
+        if(ev.results[i].isFinal) definitivo += t + ' '; else parcial += t;
+      }
+      $('#entrada').value = (textoBase + definitivo + parcial).replace(/\s{2,}/g,' ');
+    };
+    reconhecimento.onerror = ev => {
+      if(ev.error === 'no-speech') return;
+      if(ev.error === 'not-allowed'){ mostrarAviso('Permissão de microfone negada.','erro'); pararGravacao(); }
+    };
+    reconhecimento.onend = () => { if(gravando) { try{ reconhecimento.start(); }catch(e){} } };
+    try{ reconhecimento.start(); }catch(e){}
+    $('#textoGravacao').textContent = 'Ouvindo… fale agora';
+  }else{
+    $('#textoGravacao').textContent = 'Gravando áudio (sem transcrição neste navegador — escreva o texto)';
+  }
+
+  gravando = true;
+  $('#btnMic').classList.add('ativo');
+  $('#painelCaptura').classList.add('gravando');
+  $('#statusGravacao').style.display = 'flex';
+  $('#iconeMic').innerHTML = '<path d="M6 6h12v12H6z"/>';
+}
+
+function pararGravacao(){
+  gravando = false;
+  if(reconhecimento){ try{ reconhecimento.stop(); }catch(e){} reconhecimento = null; }
+  if(gravadorMidia && gravadorMidia.state !== 'inactive'){ try{ gravadorMidia.stop(); }catch(e){} }
+
+  $('#btnMic').classList.remove('ativo');
+  $('#painelCaptura').classList.remove('gravando');
+  $('#statusGravacao').style.display = 'none';
+  $('#iconeMic').innerHTML = '<path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>';
+
+  if($('#entrada').value.trim()) $('#entrada').focus();
+}
+
+/* =========================================================================
+   RENDERIZAÇÃO
+   ========================================================================= */
+function categoriasAtuais(){
+  return Array.from(new Set(itens.map(i => i.categoria || 'Geral'))).sort((a,b) => a.localeCompare(b,'pt-BR'));
+}
+
+function itensFiltrados(){
+  const busca = termoBusca.toLowerCase().trim();
+  return itens.filter(i => {
+    if(filtroStatus !== 'todos' && i.status !== filtroStatus) return false;
+    if(filtroCategoria !== 'todas' && (i.categoria || 'Geral') !== filtroCategoria) return false;
+    if(busca){
+      const alvo = (i.titulo + ' ' + (i.observacao||'') + ' ' + (i.categoria||'')).toLowerCase();
+      if(!alvo.includes(busca)) return false;
+    }
+    return true;
+  });
+}
+
+function desenhar(){
+  // números
+  $('#numTotal').textContent     = itens.length;
+  $('#numPendente').textContent  = itens.filter(i => i.status === 'pendente').length;
+  $('#numAndamento').textContent = itens.filter(i => i.status === 'andamento').length;
+  $('#numFeito').textContent     = itens.filter(i => i.status === 'feito').length;
+
+  // pílulas de categoria
+  const cats = categoriasAtuais();
+  const alvoCat = $('#pilulasCategoria');
+  if(filtroCategoria !== 'todas' && !cats.includes(filtroCategoria)) filtroCategoria = 'todas';
+  alvoCat.innerHTML = cats.length
+    ? `<button class="pilula ${filtroCategoria==='todas'?'ativa':''}" data-categoria="todas">Todas as categorias</button>` +
+      cats.map(c => `<button class="pilula ${filtroCategoria===c?'ativa':''}" data-categoria="${esc(c)}">${esc(c)}</button>`).join('')
+    : '';
+
+  // lista agrupada
+  const lista = itensFiltrados();
+  const alvo = $('#lista');
+
+  if(!lista.length){
+    alvo.innerHTML = `<div class="vazio">
+      <svg viewBox="0 0 24 24"><path d="M19 3h-4.18A3 3 0 0 0 9.18 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm-1.2 14L7 13.2l1.4-1.4 2.4 2.4 4.8-4.8L17 10.8 10.8 17z"/></svg>
+      <p>${itens.length ? 'Nenhum item com esses filtros.' : 'Nada por aqui ainda. Toque no microfone e fale sua primeira tarefa.'}</p>
+    </div>`;
+    return;
+  }
+
+  const grupos = {};
+  for(const i of lista){ (grupos[i.categoria || 'Geral'] ||= []).push(i); }
+
+  alvo.innerHTML = Object.keys(grupos)
+    .sort((a,b) => a.localeCompare(b,'pt-BR'))
+    .map(cat => {
+      const doGrupo = grupos[cat].sort((a,b) =>
+        STATUS[a.status].ordem - STATUS[b.status].ordem || b.criadoEm - a.criadoEm
+      );
+      const feitos = doGrupo.filter(i => i.status === 'feito').length;
+      return `<div class="categoria">
+        <div class="cabecalho-categoria">
+          <span class="barra"></span>
+          <h2>${esc(cat)}</h2>
+          <span class="contagem">${feitos}/${doGrupo.length}</span>
+        </div>
+        ${doGrupo.map(desenharItem).join('')}
+      </div>`;
+    }).join('');
+
+  // carrega os áudios já salvos
+  lista.filter(i => i.temAudio).forEach(async i => {
+    try{
+      const blob = await BD.ler(i.id);
+      if(!blob) return;
+      const el = document.querySelector(`[data-audio="${i.id}"]`);
+      if(el) el.src = URL.createObjectURL(blob);
+    }catch(e){}
+  });
+}
+
+function desenharItem(i){
+  const s = i.status;
+  return `<div class="item ${s}" data-id="${i.id}">
+    <button class="caixa-check" data-acao="alternar" title="Mudar status">
+      <svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+    </button>
+    <div class="corpo">
+      <div class="titulo" data-titulo>${esc(i.titulo)}</div>
+      ${i.observacao ? `<div class="obs">${esc(i.observacao)}</div>` : ''}
+      <div class="meta">
+        <span class="selo ${s}">${STATUS[s].rotulo}</span>
+        ${i.fonte === 'voz' ? '<span class="selo fonte">🎙 voz</span>' : ''}
+      </div>
+      ${i.temAudio ? `<audio class="audio-item" controls preload="none" data-audio="${i.id}"></audio>` : ''}
+    </div>
+    <div class="acoes-item">
+      <button data-acao="editar" title="Editar texto">
+        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      </button>
+      <button data-acao="excluir" class="excluir" title="Excluir">
+        <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      </button>
+    </div>
+  </div>`;
+}
+
+/* =========================================================================
+   AÇÕES NOS ITENS
+   ========================================================================= */
+function acharItem(id){ return itens.find(i => i.id === id); }
+
+$('#lista').addEventListener('click', async ev => {
+  const botao = ev.target.closest('button[data-acao]');
+  if(!botao) return;
+  const linha = botao.closest('.item');
+  const item  = acharItem(linha.dataset.id);
+  if(!item) return;
+
+  const acao = botao.dataset.acao;
+
+  if(acao === 'alternar'){
+    item.status = item.status === 'pendente' ? 'andamento'
+                : item.status === 'andamento' ? 'feito' : 'pendente';
+    item.alteradoEm = Date.now();
+    salvarItens(); desenhar();
+  }
+
+  if(acao === 'editar'){
+    const alvo = linha.querySelector('[data-titulo]');
+    alvo.contentEditable = 'true';
+    alvo.focus();
+    const intervalo = document.createRange();
+    intervalo.selectNodeContents(alvo);
+    const selecao = window.getSelection();
+    selecao.removeAllRanges(); selecao.addRange(intervalo);
+
+    const concluir = () => {
+      alvo.contentEditable = 'false';
+      const novo = alvo.textContent.trim();
+      if(novo && novo !== item.titulo){ item.titulo = novo.slice(0,140); item.alteradoEm = Date.now(); salvarItens(); }
+      desenhar();
+    };
+    alvo.addEventListener('blur', concluir, { once:true });
+    alvo.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); alvo.blur(); }
+      if(e.key === 'Escape'){ alvo.textContent = item.titulo; alvo.blur(); }
+    });
+  }
+
+  if(acao === 'excluir'){
+    itens = itens.filter(i => i.id !== item.id);
+    if(item.temAudio){ try{ await BD.apagar(item.id); }catch(e){} }
+    salvarItens(); desenhar();
+  }
+});
+
+/* =========================================================================
+   FILTROS
+   ========================================================================= */
+$('#pilulasStatus').addEventListener('click', ev => {
+  const b = ev.target.closest('.pilula'); if(!b) return;
+  filtroStatus = b.dataset.status;
+  $$('#pilulasStatus .pilula').forEach(p => p.classList.toggle('ativa', p === b));
+  desenhar();
+});
+$('#pilulasCategoria').addEventListener('click', ev => {
+  const b = ev.target.closest('.pilula'); if(!b) return;
+  filtroCategoria = b.dataset.categoria;
+  desenhar();
+});
+$('#busca').addEventListener('input', ev => { termoBusca = ev.target.value; desenhar(); });
+
+/* =========================================================================
+   BOTÕES GERAIS
+   ========================================================================= */
+$('#btnMic').addEventListener('click', alternarGravacao);
+$('#btnAdicionar').addEventListener('click', adicionar);
+$('#btnLimpar').addEventListener('click', () => { $('#entrada').value=''; audioPendente=null; esconderAviso(); });
+
+$('#entrada').addEventListener('keydown', ev => {
+  if((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter'){ ev.preventDefault(); adicionar(); }
+});
+
+$('#btnExportar').addEventListener('click', () => {
+  if(!itens.length){ mostrarAviso('Nada para exportar.','erro'); return; }
+  const cats = categoriasAtuais();
+  let texto = '# Minhas notas\n\n';
+  for(const c of cats){
+    texto += `## ${c}\n`;
+    itens.filter(i => (i.categoria||'Geral') === c)
+         .sort((a,b) => STATUS[a.status].ordem - STATUS[b.status].ordem)
+         .forEach(i => {
+           const marca = i.status === 'feito' ? '[x]' : i.status === 'andamento' ? '[~]' : '[ ]';
+           texto += `- ${marca} ${i.titulo}${i.observacao ? ' — ' + i.observacao : ''}\n`;
+         });
+    texto += '\n';
+  }
+  const url = URL.createObjectURL(new Blob([texto], { type:'text/markdown;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = 'notas.md'; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+$('#btnLimparFeitos').addEventListener('click', async () => {
+  const feitos = itens.filter(i => i.status === 'feito');
+  if(!feitos.length){ mostrarAviso('Nenhum item concluído.','info'); return; }
+  if(!confirm(`Remover ${feitos.length} item(ns) concluído(s)?`)) return;
+  for(const i of feitos){ if(i.temAudio){ try{ await BD.apagar(i.id); }catch(e){} } }
+  itens = itens.filter(i => i.status !== 'feito');
+  salvarItens(); desenhar();
+});
+
+$('#btnApagarTudo').addEventListener('click', async () => {
+  if(!itens.length) return;
+  if(!confirm('Apagar TODOS os itens e áudios? Isso não pode ser desfeito.')) return;
+  itens = [];
+  try{ await BD.limpar(); }catch(e){}
+  salvarItens(); desenhar();
+});
+
+/* =========================================================================
+   MODAIS
+   ========================================================================= */
+function abrirModal(id){ $(id).classList.add('aberto'); }
+function fecharModal(el){ el.classList.remove('aberto'); }
+
+$('#btnConfig').addEventListener('click', () => {
+  $('#chaveApi').value  = config.chaveApi || '';
+  $('#modelo').value    = config.modelo;
+  $('#idiomaVoz').value = config.idiomaVoz;
+  abrirModal('#modalConfig');
+});
+$('#btnAjuda').addEventListener('click', () => abrirModal('#modalAjuda'));
+
+$('#btnSalvarConfig').addEventListener('click', () => {
+  config.chaveApi  = $('#chaveApi').value.trim();
+  config.modelo    = $('#modelo').value;
+  config.idiomaVoz = $('#idiomaVoz').value;
+  salvarConfig();
+  fecharModal($('#modalConfig'));
+  mostrarAviso(config.chaveApi ? 'IA configurada.' : 'Configuração salva (sem IA — organização local).','ok');
+});
+
+$$('.fundo-modal').forEach(fundo => {
+  fundo.addEventListener('click', ev => { if(ev.target === fundo) fecharModal(fundo); });
+  fundo.querySelectorAll('[data-fechar]').forEach(b => b.addEventListener('click', () => fecharModal(fundo)));
+});
+document.addEventListener('keydown', ev => {
+  if(ev.key === 'Escape') $$('.fundo-modal.aberto').forEach(fecharModal);
+});
+
+/* =========================================================================
+   INÍCIO
+   ========================================================================= */
+if(!ReconhecimentoVoz){
+  console.warn('Reconhecimento de voz indisponível neste navegador — o áudio ainda é gravado.');
+}
+desenhar();
+</script>
+</body>
+</html>
