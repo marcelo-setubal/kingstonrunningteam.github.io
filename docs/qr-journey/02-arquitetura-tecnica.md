@@ -345,7 +345,7 @@ e a identidade visual do evento — nunca por screenshot, conforme §26.1.
 
 ---
 
-## 6. Leads sem persistência — a decisão que precisa ser explícita
+## 6. Leads sem persistência
 
 §9.1 exige não armazenar dados de lead. A API funciona como **proxy de passagem**: recebe,
 encaminha ao destino do cliente (o navegador não pode postar direto por causa de CORS e de
@@ -353,10 +353,28 @@ credenciais do cliente), responde, e não escreve nada em disco. Isso implica de
 endpoint especificamente: log de corpo de requisição, captura de payload no APM e fila de
 retentativa persistente.
 
-O que sobra é um trade-off real, e alguém precisa decidir: **se o destino do cliente estiver
-fora do ar, o lead se perde** — reter para reenviar é exatamente o armazenamento que a spec
-proíbe. Recomendação: retentativa em memória com TTL curto, e mensagem honesta ao visitante em
-caso de falha. A jornada nunca deve ser bloqueada por isso.
+**Decidido: retentativa apenas em memória, com TTL curto, sem nada em disco.** Se o destino do
+cliente voltar dentro dessa janela, o lead segue; se não voltar, o lead se perde. A jornada
+nunca é bloqueada por essa falha.
+
+O desenho recupera a maior parte das quedas curtas — que são a maioria — sem que o QR Journey
+deixe de ser um canal de passagem. Essa distinção é o ponto: enquanto a plataforma apenas
+repassa, o dado é do cliente e a responsabilidade de LGPD é do cliente. Bastaria uma fila
+persistente de dez minutos para o QR Journey passar a tratar dado pessoal e herdar obrigações
+de segurança, retenção e resposta a titular que hoje não tem.
+
+**Consequência comercial, decidida junto:** a perda de lead na indisponibilidade do destino é
+apresentada ao cliente na proposta, como política do produto — não como incidente. O texto
+precisa constar do contrato e do briefing (§27), em linha com:
+
+> Não retemos dados pessoais de leads. Se o seu sistema de destino estiver indisponível no
+> momento do envio, aquele lead é perdido. Essa é uma decisão de privacidade do produto: nada
+> de dado pessoal fica armazenado na plataforma.
+
+Vale posicionar como diferencial, não como ressalva: para o cliente, um fornecedor que não
+acumula base de dado pessoal é um fornecedor a menos na sua superfície de risco. O que a
+política exige em contrapartida é que o cliente mantenha o endpoint de destino saudável — e
+convém que a proposta diga isso com todas as letras.
 
 ---
 

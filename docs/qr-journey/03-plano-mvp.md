@@ -88,7 +88,8 @@ Biblioteca isolada, com testes, sem nenhuma tela.
 - Rodapé *Powered by QR Journey*
 - Formulário de briefing + galeria de uploads, com publicação manual (§27.1)
 - Relatório PDF renderizado dos agregados, não screenshot
-- Captação opcional de leads via proxy de passagem
+- Captação opcional de leads via proxy de passagem, com o texto de política de não retenção
+  no briefing e no aviso ao visitante
 
 *Critérios cobertos:* 1, 2, 3, 19 (PDF), 20.
 
@@ -168,18 +169,28 @@ Neon em vez de D1 porque o isolamento multi-tenant depende de Row Level Security
 
 Custo até o evento: zero. Nenhuma contratação é necessária para os Sprints 1 a 3.
 
+**Falha no envio de lead: retentativa em memória com TTL curto, nada em disco** (arquitetura §6).
+Se o destino do cliente não voltar dentro da janela, o lead se perde — e isso é apresentado ao
+cliente na proposta como política do produto, não como incidente.
+
+Razão: uma fila persistente de dez minutos bastaria para o QR Journey passar de canal de
+passagem a tratador de dado pessoal, herdando obrigações de LGPD que hoje não tem. Posicionar
+como diferencial — um fornecedor que não acumula base de dado pessoal é um fornecedor a menos na
+superfície de risco do cliente.
+
+Implica: texto de política no contrato e no formulário de briefing (Sprint 6).
+
 ### 4.2 Pendente
 
 Nenhum destes bloqueia os Sprints 1 a 4:
 
-1. **Comportamento na falha de envio de lead** — perder ou reter (arquitetura §6). Reter contraria §9.1.
-2. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura do QR.
-3. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
+1. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura do QR.
+2. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
    API, banco nem cofre de chaves. Sugestão: documentação permanece aqui, código vai para um
    monorepo novo com os três PWAs, a API e a biblioteca criptográfica compartilhada — sendo o
    compartilhamento dessa biblioteca a garantia de que emissor e verificador usam o mesmo código.
    Único item que precisa de resposta antes de escrever a primeira linha de código.
-4. **Dados do piloto KaBuM!** — número de estações, duração, pontos de retirada, brindes,
+3. **Dados do piloto KaBuM!** — número de estações, duração, pontos de retirada, brindes,
    operadores, dispositivos de estação e se haverá captação de lead.
 
 ---
