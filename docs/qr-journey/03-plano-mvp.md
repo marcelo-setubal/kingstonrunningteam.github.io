@@ -174,11 +174,12 @@ Nenhum destes bloqueia os Sprints 1 a 4:
 
 1. **Comportamento na falha de envio de lead** — perder ou reter (arquitetura §6). Reter contraria §9.1.
 2. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura do QR.
-4. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
+3. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
    API, banco nem cofre de chaves. Sugestão: documentação permanece aqui, código vai para um
    monorepo novo com os três PWAs, a API e a biblioteca criptográfica compartilhada — sendo o
    compartilhamento dessa biblioteca a garantia de que emissor e verificador usam o mesmo código.
-5. **Dados do piloto KaBuM!** — número de estações, duração, pontos de retirada, brindes,
+   Único item que precisa de resposta antes de escrever a primeira linha de código.
+4. **Dados do piloto KaBuM!** — número de estações, duração, pontos de retirada, brindes,
    operadores, dispositivos de estação e se haverá captação de lead.
 
 ---
