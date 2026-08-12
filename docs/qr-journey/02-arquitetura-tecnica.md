@@ -377,11 +377,43 @@ Recalculando §32 a partir de onde o tráfego realmente está — 50.000 partici
 gerenciado e uma camada stateless. A escala do produto é confortável **porque o offline-first
 tirou o caminho crítico da rede** — o requisito mais caro da spec é também o que a torna barata.
 
-**Stack recomendada**, equilibrando os critérios de §33: PWAs estáticos em CDN (Cloudflare Pages,
-Vercel ou S3+CloudFront); API stateless em edge functions ou container; Postgres gerenciado
-(Neon/Supabase/RDS) com RLS; KV de borda para config de evento; fila gerenciada para rollups;
-KMS para o segredo mestre; QR gerado com biblioteca open source no cliente, sem custo unitário
-(§34).
+### 7.1 Stack decidida
+
+**Cloudflare + Neon Postgres.**
+
+| Camada | Escolha | Papel |
+| --- | --- | --- |
+| Assets das 4 PWAs | Cloudflare Pages | CDN, distribuição global |
+| API stateless | Cloudflare Workers | `/v1/sync`, `/v1/redeem`, provisionamento, admin |
+| Banco | Neon Postgres com RLS | Isolamento multi-tenant no banco, não na aplicação |
+| Config de evento | Workers KV | Leitura de borda, sem tocar o banco |
+| Rollups de analytics | Cloudflare Queues | Processamento assíncrono |
+| Segredo mestre | Workers Secrets | Custódia; migrável para KMS dedicado se um cliente exigir |
+| QR | biblioteca open source no cliente | Sem custo unitário (§34) |
+
+**A razão técnica que decidiu a escolha:** Workers expõe a **mesma Web Crypto API do navegador**.
+HKDF e HMAC-SHA256 rodam com código idêntico no dispositivo da estação, no celular do visitante
+e no servidor que verifica. Como §9 já estabelece que emissor e verificador precisam compartilhar
+a biblioteca criptográfica, uma runtime que compartilha também a *API* elimina uma classe inteira
+de bug — a divergência sutil entre a implementação do cliente e a do servidor, que é exatamente o
+tipo de defeito que não aparece em teste e aparece no dia do evento.
+
+Neon em vez de D1 porque o isolamento multi-tenant depende de Row Level Security, que é Postgres,
+e porque o driver HTTP serverless da Neon conversa com Workers sem exigir pooler.
+
+**Custo até o evento: zero.** Sprints 1 a 3 não tocam infraestrutura — o núcleo criptográfico é
+biblioteca pura e os PWAs são estáticos. Os planos gratuitos cobrem desenvolvimento e testes com
+dezenas de pessoas. Para o evento real, plano pago — não pelo volume (83 rps é pouco), mas pelos
+limites de proteção e pelo suporte.
+
+**Ressalva conhecida:** Workers não é Node, então bibliotecas que dependem de binários nativos
+não rodam. Isso atinge a geração de PDF e XLSX do Sprint 6. Encaminhamento: usar bibliotecas
+puramente JS (`pdf-lib`, SheetJS), que atendem ao relatório formatado de §26.1 sem headless
+browser. Se o PDF exigir renderização mais rica, isolar essa função em um container à parte —
+é a única peça do sistema que justificaria sair da runtime de borda.
+
+**Escape hatch:** nada disso é irreversível. A API é stateless e o banco é Postgres padrão;
+trocar de provedor é reescrever a camada de deploy, não a arquitetura.
 
 **Ordem de grandeza de custo** (evento de 5 dias, 50 mil participantes): dezenas de dólares em
 infraestrutura variável, mais o custo fixo de domínio e observabilidade. O gargalo comercial é

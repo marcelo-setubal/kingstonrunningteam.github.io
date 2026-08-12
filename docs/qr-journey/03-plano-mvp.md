@@ -159,14 +159,21 @@ cobre a diferença entre uma TV num corredor e um tablet num balcão.
 Revisão programada: após o primeiro dia do piloto, trocar por regra proporcional — acima de 8× a
 mediana de ocupação de slot daquela estação.
 
+**Stack: Cloudflare (Pages, Workers, KV, Queues) + Neon Postgres** (arquitetura §7.1).
+
+Razão decisiva: Workers expõe a mesma Web Crypto API do navegador, então a biblioteca
+criptográfica roda com código idêntico na estação, no visitante e no verificador — eliminando a
+divergência entre implementações, que é o defeito que não aparece em teste e aparece no evento.
+Neon em vez de D1 porque o isolamento multi-tenant depende de Row Level Security.
+
+Custo até o evento: zero. Nenhuma contratação é necessária para os Sprints 1 a 3.
+
 ### 4.2 Pendente
 
 Nenhum destes bloqueia os Sprints 1 a 4:
 
 1. **Comportamento na falha de envio de lead** — perder ou reter (arquitetura §6). Reter contraria §9.1.
-2. **Provedor de nuvem**, que é o que permite trocar a ordem de grandeza de custo por um número
-   defensável.
-3. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura do QR.
+2. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura do QR.
 4. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
    API, banco nem cofre de chaves. Sugestão: documentação permanece aqui, código vai para um
    monorepo novo com os três PWAs, a API e a biblioteca criptográfica compartilhada — sendo o
