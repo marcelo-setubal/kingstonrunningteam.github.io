@@ -132,18 +132,38 @@ Todos os 22 critérios estão cobertos.
 
 ---
 
-## 4. Decisões pendentes antes de codificar
+## 4. Decisões de produto
 
-Quatro itens dependem de definição de produto ou do cliente, não de engenharia. Nenhum bloqueia
-o Sprint 1, mas o 4.1 e o 4.2 bloqueiam o Sprint 4:
+### 4.1 Decidido
 
-1. **Política de duplicata de caminhada** — `permitir`, `avisar` ou `bloquear` (arquitetura §3.6).
-   Recomendação: `avisar`, para não punir quem andou acompanhado.
-2. **Limiar de sessões por slot** que dispara suspeita de vazamento de estação. Recomendação: 25,
+**Duplicata de caminhada: `avisar`** (arquitetura §3.6). Quando o percurso de uma jornada
+coincide com o de um resgate já feito, o operador vê o alerta e decide entre entregar mesmo
+assim ou recusar. Não bloqueia automaticamente.
+
+Razão: dos dois erros possíveis, entregar um brinde a mais é barato e recusar um cliente
+legítimo na frente da fila é caro — e o operador tem contexto que o sistema não tem. As duas
+saídas são registradas, para que a política possa ser endurecida em eventos futuros com base
+no volume real de duplicatas.
+
+Implica: quarta resposta na interface do operador (Sprint 4) e as colunas `duplicate_flag` e
+`operator_decision` em `redemption`.
+
+### 4.2 Pendente
+
+Nenhum destes bloqueia o Sprint 1. O primeiro bloqueia o Sprint 4:
+
+1. **Limiar de sessões por slot** que dispara suspeita de vazamento de estação. Recomendação: 25,
    calibrando depois do primeiro dia do piloto.
-3. **Comportamento na falha de envio de lead** — perder ou reter (arquitetura §6). Reter contraria §9.1.
-4. **Provedor de nuvem**, que é o que permite trocar a ordem de grandeza de custo por um número
+2. **Comportamento na falha de envio de lead** — perder ou reter (arquitetura §6). Reter contraria §9.1.
+3. **Provedor de nuvem**, que é o que permite trocar a ordem de grandeza de custo por um número
    defensável.
+4. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura do QR.
+5. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
+   API, banco nem cofre de chaves. Sugestão: documentação permanece aqui, código vai para um
+   monorepo novo com os três PWAs, a API e a biblioteca criptográfica compartilhada — sendo o
+   compartilhamento dessa biblioteca a garantia de que emissor e verificador usam o mesmo código.
+6. **Dados do piloto KaBuM!** — número de estações, duração, pontos de retirada, brindes,
+   operadores, dispositivos de estação e se haverá captação de lead.
 
 ---
 

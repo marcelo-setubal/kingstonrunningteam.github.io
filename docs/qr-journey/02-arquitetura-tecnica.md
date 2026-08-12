@@ -209,9 +209,25 @@ Duas sessões só colidem no fingerprint se escanearam **todas** as estações e
 mesmos slots de 15 s — isto é, se vieram da mesma caminhada física. Dois amigos andando juntos
 de verdade raramente batem os 20 slots. Um lote repassado por mensageria bate todos.
 
-Política configurável por evento — `permitir` / `avisar` / `bloquear`, com **avisar** como
-padrão: o operador vê o alerta e decide, o que preserva o caso legítimo do casal que andou
-lado a lado. Complementarmente, no sync, um `(station, slot)` reivindicado por um número
+A política é configuração por evento — `permitir` / `avisar` / `bloquear`. **Decidido para o
+piloto KaBuM!: `avisar`.** O operador vê o alerta e decide, o que preserva o caso legítimo do
+casal que andou lado a lado. O raciocínio: dos dois erros possíveis, entregar um brinde a mais
+é barato, e recusar um cliente legítimo na frente da fila é caro. O operador enxerga se são
+duas pessoas ali paradas — contexto que o sistema não tem.
+
+Na interface do operador (§21), a duplicata é uma quarta resposta, com saída explícita:
+
+```text
+⚠  Possível duplicata
+   Esta jornada tem o mesmo percurso de um resgate já feito.
+   [ Entregar mesmo assim ]   [ Recusar ]
+```
+
+Ambas as saídas são registradas — `redemption.duplicate_flag` e a escolha do operador —
+para que o analytics mostre o volume real de duplicatas e permita endurecer a política em
+eventos futuros com base em dado, não em suposição.
+
+Complementarmente, no sync, um `(station, slot)` reivindicado por um número
 anômalo de sessões distintas (padrão: > 25) é sinalizado no analytics como suspeita de
 vazamento daquela estação. Isso entrega o "antifraude moderado" de §39 sem custo de latência
 no caminho crítico.
@@ -258,9 +274,11 @@ station_checkin(session_id, station_id, slot, tag bytea, registrado_em,
 reward(id, event_id, nome, imagem_url)
 redemption_point(id, event_id, nome)
 redemption(id, event_id, session_id, reward_id, operator_id,
-           redemption_point_id, criado_em, status)
+           redemption_point_id, criado_em, status,
+           duplicate_flag bool, operator_decision)
     -- unique(event_id, session_id)  ← garantia de uso único
     -- status ∈ AVAILABLE | REDEEMED | INVALID | EXPIRED   (§45)
+    -- operator_decision ∈ NONE | DELIVERED_ANYWAY | REFUSED   (política 'avisar', §3.6)
 
 client_briefing(id, tenant_id, payload_jsonb, anexos_jsonb, status, enviado_em)
 integration(id, tenant_id, event_id, tipo, config_jsonb)
