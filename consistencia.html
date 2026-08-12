@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>Consistência — sistema pessoal de performance</title>
+<link rel="manifest" href="consistencia.webmanifest">
+<link rel="icon" href="icone-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icone-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Consistência">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --preto:#0a0a0a;
+  --preto-2:#121212;
+  --preto-3:#191919;
+  --preto-4:#212121;
+  --borda:#2a2a2a;
+  --borda-2:#383838;
+  --branco:#ffffff;
+  --cinza:#9a9a9a;
+  --cinza-2:#6a6a6a;
+  --volt:#d7ff2e;         /* energia, progresso, XP */
+  --volt-escuro:#9ec71a;
+  --volt-fraco:rgba(215,255,46,.14);
+  --verde:#25c26e;        /* concluído */
+  --vermelho:#e10600;     /* marca e ações destrutivas */
+  --ambar:#ffb020;        /* parcial */
+  --azul:#3b82f6;
+  --raio:16px;
+  --curva:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--preto);
+  color:var(--branco);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+  padding-bottom:calc(86px + env(safe-area-inset-bottom));
+  overflow-x:hidden;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+.container{width:100%;max-width:820px;margin:0 auto;padding:0 16px}
+.titulo{
+  font-family:'Anton',sans-serif;font-weight:400;
+  text-transform:uppercase;letter-spacing:.04em;line-height:1.05;margin:0;
+}
+.rotulo{
+  font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cinza-2);
+}
+.oculto{display:none !important}
+
+/* ---------- Cabeçalho ---------- */
+header{
+  position:sticky;top:0;z-index:40;
+  border-bottom:1px solid var(--borda);
+  background:rgba(10,10,10,.86);
+  backdrop-filter:blur(12px);
+  padding-top:env(safe-area-inset-top);
+}
+.topo{display:flex;align-items:center;gap:12px;padding:12px 0}
+.marca{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
+.marca .bolha{
+  width:40px;height:40px;border-radius:12px;flex:none;
+  background:var(--vermelho);display:grid;place-items:center;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 8px 20px rgba(225,6,0,.35);
+}
+.marca .bolha svg{width:21px;height:21px;fill:#fff}
+.marca h1{font-family:'Anton',sans-serif;font-weight:400;font-size:1.32rem;letter-spacing:.05em;
+  text-transform:uppercase;margin:0;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.marca h1 span{color:var(--volt)}
+.marca p{margin:1px 0 0;font-size:.7rem;color:var(--cinza-2);letter-spacing:.03em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip-xp{
+  display:flex;align-items:center;gap:7px;flex:none;
+  background:var(--preto-3);border:1px solid var(--borda);border-radius:999px;
+  padding:7px 13px 7px 10px;
+}
+.chip-xp .raio{width:15px;height:15px;fill:var(--volt);flex:none}
+.chip-xp b{font-size:.9rem;font-weight:800;letter-spacing:-.01em}
+.chip-xp small{display:block;font-size:.6rem;color:var(--cinza-2);letter-spacing:.08em;text-transform:uppercase;line-height:1}
+
+/* ---------- Cards ---------- */
+.card{
+  background:var(--preto-2);border:1px solid var(--borda);
+  border-radius:var(--raio);padding:16px;margin-top:14px;
+}
+.card-titulo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.card-titulo h2{font-family:'Anton',sans-serif;font-weight:400;font-size:1.05rem;
+  letter-spacing:.06em;text-transform:uppercase;margin:0}
+
+/* ---------- Herói do dia ---------- */
+.heroi{margin-top:16px;position:relative;overflow:hidden;
+  border-radius:20px;border:1px solid var(--borda);
+  background:linear-gradient(150deg,#1d1d1d 0%,var(--preto-2) 52%,var(--preto) 100%);
+  padding:18px}
+.heroi::after{
+  content:'';position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;
+  background:radial-gradient(circle,rgba(215,255,46,.16) 0%,transparent 68%);pointer-events:none;
+}
+.heroi .saudacao{font-size:.8rem;color:var(--cinza);margin:0}
+.heroi .data{font-size:.68rem;color:var(--cinza-2);letter-spacing:.12em;text-transform:uppercase;margin:2px 0 12px}
+.heroi .grande{font-family:'Anton',sans-serif;font-size:3.4rem;line-height:.92;letter-spacing:.01em;margin:0}
+.heroi .grande small{font-size:1.1rem;color:var(--cinza);margin-left:6px;font-family:'Inter',sans-serif;font-weight:600}
+.heroi .legenda{font-size:.82rem;color:var(--cinza);margin:6px 0 0}
+.heroi-linha{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;position:relative;z-index:1}
+.selo{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;position:relative;z-index:1}
+.selo span{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;
+  background:var(--preto-3);border:1px solid var(--borda);border-radius:999px;padding:6px 11px;color:var(--cinza)}
+.selo span b{color:var(--branco);font-weight:800}
+.selo span.aceso{border-color:rgba(215,255,46,.4);background:var(--volt-fraco);color:var(--volt)}
+.selo span.aceso b{color:var(--volt)}
+
+/* ---------- Barras ---------- */
+.barra{height:10px;background:var(--preto-4);border-radius:999px;overflow:hidden;position:relative}
+.barra i{
+  display:block;height:100%;width:0;border-radius:999px;
+  background:linear-gradient(90deg,var(--volt-escuro,#9ec71a),var(--volt));
+  transition:width .75s var(--curva);
+}
+.barra.fina{height:6px}
+.barra.verde i{background:linear-gradient(90deg,#189d55,var(--verde))}
+.barra.ambar i{background:linear-gradient(90deg,#cf8a10,var(--ambar))}
+.barra-topo{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:7px}
+.barra-topo b{font-size:.95rem;font-weight:800}
+.barra-item + .barra-item{margin-top:14px}
+
+/* ---------- Atividade do dia ---------- */
+.atividade{
+  display:flex;align-items:center;gap:13px;
+  background:var(--preto-3);border:1px solid var(--borda);border-radius:14px;padding:13px;
+  transition:border-color .25s,background .25s;
+}
+.atividade.feita{border-color:rgba(37,194,110,.45);background:rgba(37,194,110,.08)}
+.atividade .emoji{font-size:1.6rem;line-height:1;flex:none;width:44px;height:44px;border-radius:12px;
+  display:grid;place-items:center;background:var(--preto-4)}
+.atividade .txt{flex:1;min-width:0}
+.atividade .txt b{display:block;font-size:1rem;font-weight:700}
+.atividade .txt span{display:block;font-size:.75rem;color:var(--cinza-2)}
+.acoes-atividade{display:flex;gap:8px;margin-top:10px}
+
+/* ---------- Lista de hábitos ---------- */
+.habito{
+  display:flex;align-items:center;gap:12px;padding:12px;
+  background:var(--preto-3);border:1px solid var(--borda);border-radius:14px;
+  transition:border-color .25s,background .25s,transform .18s var(--curva);
+}
+.habito + .habito{margin-top:9px}
+.habito.feito{border-color:rgba(37,194,110,.4);background:rgba(37,194,110,.07)}
+.habito.parcial{border-color:rgba(255,176,32,.4);background:rgba(255,176,32,.06)}
+.habito .emoji{font-size:1.35rem;line-height:1;flex:none;width:40px;height:40px;border-radius:11px;
+  display:grid;place-items:center;background:var(--preto-4)}
+.habito .info{flex:1;min-width:0}
+.habito .info b{display:block;font-size:.94rem;font-weight:700;line-height:1.25}
+.habito .info span{display:block;font-size:.74rem;color:var(--cinza-2);margin-top:1px}
+.habito.feito .info b{color:var(--verde)}
+.marcador{
+  width:34px;height:34px;flex:none;border-radius:50%;
+  border:2px solid var(--borda-2);background:transparent;
+  display:grid;place-items:center;transition:.22s var(--curva);
+}
+.marcador svg{width:17px;height:17px;fill:none;stroke:var(--cinza-2);stroke-width:3;
+  stroke-linecap:round;stroke-linejoin:round;transition:.2s}
+.marcador.feito{background:var(--verde);border-color:var(--verde)}
+.marcador.feito svg{stroke:#04220f}
+.habito.pulsa{animation:pulo .4s var(--curva)}
+@keyframes pulo{0%{transform:scale(1)}40%{transform:scale(1.028)}100%{transform:scale(1)}}
+.contador{display:flex;align-items:center;gap:8px;flex:none}
+.contador button{
+  width:32px;height:32px;border-radius:10px;border:1px solid var(--borda-2);
+  background:var(--preto-4);display:grid;place-items:center;font-size:1.1rem;font-weight:700;line-height:1;
+  transition:.15s;
+}
+.contador button:active{transform:scale(.9)}
+.contador button:hover{border-color:var(--volt);color:var(--volt)}
+.habito-progresso{margin-top:9px}
+
+/* ---------- Botões ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:12px;border:1px solid var(--borda-2);background:var(--preto-3);
+  padding:11px 15px;font-size:.86rem;font-weight:700;transition:.16s var(--curva);
+}
+.btn:active{transform:scale(.97)}
+.btn:hover{border-color:var(--cinza-2)}
+.btn.volt{background:var(--volt);border-color:var(--volt);color:#141a00}
+.btn.volt:hover{filter:brightness(1.08)}
+.btn.perigo{color:var(--vermelho);border-color:rgba(225,6,0,.4)}
+.btn.perigo:hover{background:rgba(225,6,0,.1)}
+.btn.bloco{width:100%}
+.btn.pequeno{padding:8px 12px;font-size:.78rem;border-radius:10px}
+.btn-icone{
+  width:38px;height:38px;flex:none;border-radius:11px;
+  background:var(--preto-3);border:1px solid var(--borda);color:var(--branco);
+  display:grid;place-items:center;transition:.15s;
+}
+.btn-icone:hover{border-color:var(--volt);color:var(--volt)}
+.btn-icone svg{width:17px;height:17px;fill:currentColor}
+
+/* ---------- Navegação inferior ---------- */
+nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:rgba(12,12,12,.94);backdrop-filter:blur(14px);
+  border-top:1px solid var(--borda);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-int{display:flex;max-width:820px;margin:0 auto}
+nav button{
+  flex:1;background:none;border:0;padding:9px 4px 11px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  color:var(--cinza-2);transition:color .2s;position:relative;
+}
+nav button svg{width:21px;height:21px;fill:currentColor;transition:transform .25s var(--curva)}
+nav button span{font-size:.63rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+nav button.ativo{color:var(--volt)}
+nav button.ativo svg{transform:translateY(-1px) scale(1.08)}
+nav button.ativo::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:26px;height:3px;border-radius:0 0 3px 3px;background:var(--volt);
+}
+
+/* ---------- Agenda / semana ---------- */
+.tira{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dia{
+  background:var(--preto-3);border:1px solid var(--borda);border-radius:12px;
+  padding:9px 3px;text-align:center;transition:.2s var(--curva);
+}
+.dia:active{transform:scale(.96)}
+.dia .dsem{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cinza-2)}
+.dia .dnum{font-size:.95rem;font-weight:800;margin:2px 0 4px}
+.dia .demoji{font-size:.9rem;line-height:1}
+.dia .anel{margin:5px auto 0;width:22px;height:22px}
+.dia.hoje{border-color:var(--volt);box-shadow:0 0 0 2px rgba(215,255,46,.16)}
+.dia.futuro{opacity:.45}
+.linha-relatorio{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--borda)}
+.linha-relatorio:last-child{border-bottom:0}
+.linha-relatorio span{font-size:.85rem;color:var(--cinza)}
+.linha-relatorio b{font-size:.95rem;font-weight:800;white-space:nowrap}
+.delta{font-size:.72rem;font-weight:700;margin-left:6px}
+.delta.sobe{color:var(--verde)}
+.delta.desce{color:var(--ambar)}
+.nota{display:flex;gap:9px;padding:10px;border-radius:12px;background:var(--preto-3);
+  border:1px solid var(--borda);font-size:.83rem;color:var(--cinza);line-height:1.45}
+.nota + .nota{margin-top:8px}
+.nota b{color:var(--branco)}
+.nota.bom{border-color:rgba(37,194,110,.3);background:rgba(37,194,110,.06)}
+.nota.ajuste{border-color:rgba(255,176,32,.3);background:rgba(255,176,32,.05)}
+.nota .ico{flex:none;font-size:1rem;line-height:1.35}
+
+/* ---------- Grade de números ---------- */
+.grade{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.grade.tres{grid-template-columns:repeat(3,1fr)}
+.bloco-num{background:var(--preto-3);border:1px solid var(--borda);border-radius:13px;padding:12px}
+.bloco-num b{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:1.6rem;line-height:1.05}
+.bloco-num small{display:block;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza-2);margin-top:4px}
+.bloco-num.volt b{color:var(--volt)}
+.bloco-num.verde b{color:var(--verde)}
+
+/* ---------- Formulários ---------- */
+label.campo{display:block;margin-top:13px}
+label.campo > span{display:block;font-size:.7rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--cinza-2);margin-bottom:6px}
+input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{
+  width:100%;background:var(--preto-3);border:1px solid var(--borda);border-radius:11px;
+  padding:11px 12px;outline:0;transition:border-color .18s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--volt)}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--cinza) 50%),
+  linear-gradient(135deg,var(--cinza) 50%,transparent 50%);
+  background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:34px}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.interruptor{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0}
+.interruptor + .interruptor{border-top:1px solid var(--borda)}
+.chave{width:46px;height:27px;border-radius:999px;background:var(--preto-4);border:1px solid var(--borda-2);
+  position:relative;flex:none;transition:.22s var(--curva)}
+.chave::after{content:'';position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;
+  background:var(--cinza);transition:.22s var(--curva)}
+.chave.on{background:var(--volt-fraco);border-color:var(--volt)}
+.chave.on::after{left:22px;background:var(--volt)}
+
+/* ---------- Lista editável ---------- */
+.item-lista{display:flex;align-items:center;gap:11px;padding:11px;background:var(--preto-3);
+  border:1px solid var(--borda);border-radius:13px}
+.item-lista + .item-lista{margin-top:8px}
+.item-lista .emoji{font-size:1.2rem;width:36px;height:36px;flex:none;border-radius:10px;
+  display:grid;place-items:center;background:var(--preto-4)}
+.item-lista .info{flex:1;min-width:0}
+.item-lista .info b{display:block;font-size:.9rem;font-weight:700}
+.item-lista .info span{display:block;font-size:.72rem;color:var(--cinza-2)}
+.item-lista.pausado{opacity:.5}
+
+/* ---------- Folha (modal) ---------- */
+.veu{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.68);backdrop-filter:blur(3px);
+  opacity:0;pointer-events:none;transition:opacity .25s}
+.veu.aberto{opacity:1;pointer-events:auto}
+.folha{
+  position:fixed;left:0;right:0;bottom:0;z-index:61;max-height:88vh;overflow-y:auto;
+  background:var(--preto-2);border-top:1px solid var(--borda-2);
+  border-radius:22px 22px 0 0;padding:8px 16px calc(24px + env(safe-area-inset-bottom));
+  transform:translateY(102%);transition:transform .32s var(--curva);
+  -webkit-overflow-scrolling:touch;
+}
+.folha.aberta{transform:translateY(0)}
+.puxador{width:38px;height:4px;border-radius:99px;background:var(--borda-2);margin:8px auto 14px}
+.folha h3{font-family:'Anton',sans-serif;font-weight:400;font-size:1.2rem;letter-spacing:.05em;
+  text-transform:uppercase;margin:0 0 4px}
+.folha .sub{font-size:.8rem;color:var(--cinza-2);margin:0 0 14px}
+.folha-acoes{display:flex;gap:9px;margin-top:18px}
+.folha-acoes .btn{flex:1}
+@media(min-width:720px){
+  .folha{left:50%;right:auto;bottom:auto;top:50%;width:min(520px,92vw);
+    transform:translate(-50%,-46%) scale(.96);opacity:0;border-radius:20px;border:1px solid var(--borda-2);
+    max-height:86vh;transition:transform .28s var(--curva),opacity .22s}
+  .folha.aberta{transform:translate(-50%,-50%) scale(1);opacity:1}
+  .puxador{display:none}
+}
+
+/* ---------- Aviso ---------- */
+.aviso{
+  position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));z-index:70;
+  transform:translate(-50%,16px);opacity:0;pointer-events:none;
+  background:var(--branco);color:#0a0a0a;font-weight:700;font-size:.84rem;
+  padding:11px 17px;border-radius:999px;box-shadow:0 10px 34px rgba(0,0,0,.5);
+  transition:.3s var(--curva);white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;
+}
+.aviso.visivel{opacity:1;transform:translate(-50%,0)}
+.aviso.volt{background:var(--volt)}
+
+/* ---------- Celebração discreta ---------- */
+.brilho{position:fixed;inset:0;z-index:65;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at 50% 62%,rgba(215,255,46,.22) 0%,transparent 62%)}
+.brilho.acende{animation:acender .9s ease-out}
+@keyframes acender{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+
+/* ---------- Gráficos ---------- */
+.grafico{width:100%;height:132px;display:block;overflow:visible}
+.vazio{text-align:center;color:var(--cinza-2);font-size:.85rem;padding:22px 10px;line-height:1.6}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+@media(min-width:720px){
+  body{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+  .heroi .grande{font-size:4.2rem}
+  .grade{grid-template-columns:repeat(4,1fr)}
+  .grade.tres{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container topo">
+    <div class="marca">
+      <div class="bolha">
+        <svg viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z"/></svg>
+      </div>
+      <div style="min-width:0">
+        <h1>CONSIS<span>TÊNCIA</span></h1>
+        <p id="rodape-ciclo">—</p>
+      </div>
+    </div>
+    <div class="chip-xp">
+      <svg class="raio" viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z"/></svg>
+      <div>
+        <b id="xp-topo">0</b>
+        <small id="nivel-topo">Nível 1</small>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section id="v-hoje"></section>
+  <section id="v-semana" class="oculto"></section>
+  <section id="v-progresso" class="oculto"></section>
+  <section id="v-ajustes" class="oculto"></section>
+</main>
+
+<nav>
+  <div class="nav-int">
+    <button data-aba="hoje" class="ativo">
+      <svg viewBox="0 0 24 24"><path d="M12 2 3 9v12h6v-7h6v7h6V9z"/></svg><span>Hoje</span>
+    </button>
+    <button data-aba="semana">
+      <svg viewBox="0 0 24 24"><path d="M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2zm12 8v10H5V10zM7 12v2h2v-2zm4 0v2h2v-2zm4 0v2h2v-2z"/></svg><span>Semana</span>
+    </button>
+    <button data-aba="progresso">
+      <svg viewBox="0 0 24 24"><path d="M4 20h16v2H2V2h2zm3-2V9h3v9zm5 0V4h3v14zm5 0v-6h3v6z"/></svg><span>Progresso</span>
+    </button>
+    <button data-aba="ajustes">
+      <svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8m0 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4M10 1l-.6 2.6a8.5 8.5 0 0 0-1.8 1L5 3.8 3 7.2l2 1.7a8.6 8.6 0 0 0 0 2.2l-2 1.7 2 3.4 2.6-.8c.55.42 1.16.76 1.8 1L10 19h4l.6-2.6c.64-.24 1.25-.58 1.8-1l2.6.8 2-3.4-2-1.7a8.6 8.6 0 0 0 0-2.2l2-1.7-2-3.4-2.6.8a8.5 8.5 0 0 0-1.8-1L14 1z"/></svg><span>Ajustes</span>
+    </button>
+  </div>
+</nav>
+
+<div class="veu" id="veu"></div>
+<div class="folha" id="folha"><div class="puxador"></div><div id="folha-corpo"></div></div>
+<div class="aviso" id="aviso"></div>
+<div class="brilho" id="brilho"></div>
+
+<script>
+/* =========================================================================
+   Projeto Consistência — Fase 1
+   Sistema pessoal de consistência: ciclos de 4 semanas, hábitos configuráveis,
+   agenda de atividades, XP e progresso visual.
+
+   Arquitetura dos dados (documento mestre, seção 15):
+     PLANO     -> dados.ciclos[].habitos / agenda / metas   (o que deveria acontecer)
+     EXECUÇÃO  -> dados.registros['AAAA-MM-DD']             (o que realmente aconteceu)
+     RESULTADO -> dados.pesagens / dados.medidas            (consequências observadas)
+
+   Nada de meta fica hardcoded: tudo vive na configuração do ciclo, editável
+   pelo painel de Ajustes.
+   ========================================================================= */
+
+const CHAVE = 'consistencia.v1';
+
+/* ---------- Catálogo de atividades (seção 4) ---------- */
+const TIPOS_ATIVIDADE = {
+  academia:    {nome:'Academia',         emoji:'🏋️', exige:true},
+  caminhada:   {nome:'Caminhada',        emoji:'🚶', exige:true},
+  corrida:     {nome:'Corrida',          emoji:'🏃', exige:true},
+  casa:        {nome:'Treino em casa',   emoji:'🏠', exige:true},
+  livre:       {nome:'Atividade física', emoji:'⚡', exige:true},
+  recuperacao: {nome:'Recuperação',      emoji:'🌿', exige:false},
+  descanso:    {nome:'Descanso',         emoji:'😴', exige:false},
+  custom:      {nome:'Personalizada',    emoji:'⭐', exige:true}
+};
+
+const DIAS_CURTOS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const DIAS_LONGOS = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+/* =========================================================================
+   1. Configuração padrão — primeiro ciclo (documento mestre, seções 3, 4 e 17)
+   ========================================================================= */
+function cicloPadrao(){
+  return {
+    id: 'ciclo-1',
+    nome: 'Ciclo 1 — Reativação',
+    objetivo: 'Reativar hábitos e construir uma rotina sustentável.',
+    inicio: '2026-08-12',
+    semanas: 4,
+    metaConsistencia: 90,
+    habitos: [
+      {id:'alimentacao', nome:'Registrar alimentação', emoji:'🍽️', tipo:'check',
+       detalhe:'Lançar o dia no app de calorias', meta:null, unidade:'', xp:10, ativo:true},
+      {id:'sem-doce', nome:'Zero doce industrializado', emoji:'🍫', tipo:'check',
+       detalhe:'Chocolate, bombom, paçoca e similares', meta:null, unidade:'', xp:10, ativo:true},
+      {id:'creatina', nome:'Creatina', emoji:'💊', tipo:'check',
+       detalhe:'Dose diária', meta:null, unidade:'', xp:10, ativo:true},
+      {id:'agua', nome:'Água', emoji:'💧', tipo:'quantidade',
+       detalhe:'Meta do dia', meta:3.5, unidade:'L', passo:0.25, xp:15, ativo:true},
+      {id:'sono', nome:'Sono', emoji:'🌙', tipo:'sono',
+       detalhe:'Estar na cama até a meta da semana', meta:null, unidade:'', xp:15, ativo:true}
+    ],
+    /* Progressão do sono, semana a semana (seção 3.1) */
+    metasSono: ['00:30','00:15','00:00','23:45'],
+    toleranciaSono: 30,          // minutos ainda contados como "quase lá"
+    /* Agenda semanal padrão, índice 0 = domingo (seção 4) */
+    agenda: {
+      0:{tipo:'recuperacao'}, 1:{tipo:'recuperacao'}, 2:{tipo:'caminhada'},
+      3:{tipo:'caminhada'},   4:{tipo:'recuperacao'}, 5:{tipo:'livre'},
+      6:{tipo:'academia'}
+    },
+    excecoes: {},                // ajuste pontual de um único dia
+    pesagem: {ativa:true, diaSemana:3},   // quarta-feira
+    pesoReferencia: 116,
+    medidas: ['Cintura','Quadril'],
+    xp: {
+      atividade:20, bonusDiaCompleto:25, bonusSemanaMeta:100,
+      bonusSemanaPerfeita:50, bonusRetomada:15
+    }
+  };
+}
+
+function dadosPadrao(){
+  return {
+    versao: 1,
+    cicloAtivo: 'ciclo-1',
+    ciclos: [cicloPadrao()],
+    /* Execução: a caminhada de 12/08 já estava realizada no início do projeto */
+    registros: {'2026-08-12': {atividade:{feita:true, tipo:'caminhada'}, habitos:{}, extras:[]}},
+    pesagens: [],
+    medidas: []
+  };
+}
+
+/* =========================================================================
+   2. Persistência
+   ========================================================================= */
+let dados = carregar();
+
+function carregar(){
+  try{
+    const cru = localStorage.getItem(CHAVE);
+    if(!cru) return dadosPadrao();
+    const d = JSON.parse(cru);
+    // Preenche campos que possam faltar em bases antigas.
+    d.registros = d.registros || {};
+    d.pesagens  = d.pesagens  || [];
+    d.medidas   = d.medidas   || [];
+    d.ciclos    = (d.ciclos && d.ciclos.length) ? d.ciclos : [cicloPadrao()];
+    return d;
+  }catch(e){
+    console.warn('Base ilegível, recomeçando com o padrão.', e);
+    return dadosPadrao();
+  }
+}
+
+let guardaPendente = null;
+function salvar(){
+  clearTimeout(guardaPendente);
+  guardaPendente = setTimeout(() => {
+    try{ localStorage.setItem(CHAVE, JSON.stringify(dados)); }
+    catch(e){ avisar('Não consegui salvar neste dispositivo.'); }
+  }, 120);
+}
+
+function ciclo(){
+  return dados.ciclos.find(c => c.id === dados.cicloAtivo) || dados.ciclos[0];
+}
+
+/* =========================================================================
+   3. Utilidades de data (sempre no fuso local, nunca UTC)
+   ========================================================================= */
+function iso(d){
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dia = String(d.getDate()).padStart(2,'0');
+  return `${d.getFullYear()}-${m}-${dia}`;
+}
+function deIso(s){
+  const [a,m,d] = s.split('-').map(Number);
+  return new Date(a, m-1, d);
+}
+function hoje(){ return iso(new Date()); }
+function somaDias(s, n){
+  const d = deIso(s); d.setDate(d.getDate()+n); return iso(d);
+}
+function difDias(a, b){
+  return Math.round((deIso(b) - deIso(a)) / 86400000);
+}
+function fimDoCiclo(c){ return somaDias(c.inicio, c.semanas*7 - 1); }
+function totalDiasCiclo(c){ return c.semanas * 7; }
+
+/** Semana do ciclo (1..n) para uma data, ou null se fora do ciclo. */
+function semanaDoCiclo(data, c){
+  const d = difDias(c.inicio, data);
+  if(d < 0 || d >= totalDiasCiclo(c)) return null;
+  return Math.floor(d/7) + 1;
+}
+/** Primeiro dia da semana n do ciclo. */
+function inicioSemana(n, c){ return somaDias(c.inicio, (n-1)*7); }
+/** Os dias de uma semana do ciclo. */
+function diasDaSemana(n, c){
+  const base = inicioSemana(n, c);
+  return Array.from({length:7}, (_,i) => somaDias(base, i));
+}
+function dataLonga(s){
+  const d = deIso(s);
+  return `${DIAS_LONGOS[d.getDay()]}, ${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function dataCurta(s){
+  const d = deIso(s);
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function ehFuturo(data){ return difDias(hoje(), data) > 0; }
+
+/* Horário no formato HH:MM -> minutos numa régua que começa às 18h,
+   para que 00:30 seja "depois" de 23:45 e a comparação do sono funcione. */
+function minutosNoite(hhmm){
+  const [h,m] = hhmm.split(':').map(Number);
+  let t = h*60 + m;
+  if(t < 12*60) t += 24*60;   // madrugada pertence à noite anterior
+  return t;
+}
+
+/* =========================================================================
+   4. Plano do dia
+   ========================================================================= */
+function habitosAtivos(c){ return c.habitos.filter(h => h.ativo); }
+
+/** Atividade planejada para a data: exceção do dia, senão a agenda semanal. */
+function atividadePlanejada(data, c){
+  const ex = c.excecoes[data];
+  const base = ex || c.agenda[deIso(data).getDay()] || {tipo:'descanso'};
+  const cat = TIPOS_ATIVIDADE[base.tipo] || TIPOS_ATIVIDADE.custom;
+  return {
+    tipo: base.tipo,
+    nome: base.nome || cat.nome,
+    emoji: base.emoji || cat.emoji,
+    exige: base.exige !== undefined ? base.exige : cat.exige,
+    excecao: !!ex
+  };
+}
+
+function registro(data){
+  if(!dados.registros[data]) dados.registros[data] = {habitos:{}, atividade:null, extras:[]};
+  const r = dados.registros[data];
+  r.habitos = r.habitos || {};
+  r.extras  = r.extras  || [];
+  return r;
+}
+
+/** Meta de sono vigente na data (progressão semana a semana). */
+function metaSono(data, c){
+  const s = semanaDoCiclo(data, c);
+  const lista = c.metasSono || [];
+  if(!lista.length) return null;
+  const i = Math.min(Math.max((s||1)-1, 0), lista.length-1);
+  return lista[i];
+}
+
+/* =========================================================================
+   5. Avaliação — quanto de cada ação foi cumprido (0 a 1) e quanto XP gerou
+   ========================================================================= */
+function avaliarHabito(h, data, c){
+  const valor = registro(data).habitos[h.id];
+
+  if(h.tipo === 'quantidade'){
+    const v = Number(valor) || 0;
+    const meta = Number(h.meta) || 0;
+    const razao = meta > 0 ? Math.min(v/meta, 1) : (v > 0 ? 1 : 0);
+    const feito = razao >= 1 ? 1 : 0;                 // consistência é o check final
+    return {feito, razao, xp: feito ? h.xp : 0, valor:v,
+            texto:`${fmtNum(v)} ${h.unidade} / ${fmtNum(meta)} ${h.unidade}`};
+  }
+
+  if(h.tipo === 'sono'){
+    const meta = metaSono(data, c);
+    const reg = valor && typeof valor === 'object' ? valor : null;
+    if(!reg || !reg.deitar) {
+      return {feito:0, razao:0, xp:0, valor:null,
+              texto: meta ? `Meta: na cama até ${meta}` : 'Sem meta definida'};
+    }
+    if(!meta) return {feito:1, razao:1, xp:h.xp, valor:reg, texto:`Deitou ${reg.deitar}`};
+    const atraso = minutosNoite(reg.deitar) - minutosNoite(meta);
+    let feito, razao, estado;
+    if(atraso <= 0){ feito = 1; razao = 1; estado = 'Meta atingida'; }
+    else if(atraso <= (c.toleranciaSono || 30)){ feito = 0.5; razao = .6; estado = 'Perto da meta'; }
+    else { feito = 0; razao = .2; estado = 'Longe da meta'; }
+    const horas = reg.horas ? ` · ${fmtNum(reg.horas)} h` : '';
+    return {feito, razao, xp: Math.round(h.xp * feito), valor:reg,
+            texto:`${estado} · deitou ${reg.deitar}${horas}`};
+  }
+
+  // tipo 'check'
+  const feito = valor === true ? 1 : 0;
+  return {feito, razao:feito, xp: feito ? h.xp : 0, valor:!!valor,
+          texto: h.detalhe || ''};
+}
+
+function avaliarAtividade(data, c){
+  const plano = atividadePlanejada(data, c);
+  const reg = registro(data).atividade;
+  if(!plano.exige){
+    // Descanso e recuperação fazem parte do plano: cumprem-se sozinhos.
+    return {planejada:0, feito:0, xp:0, plano, automatica:true, marcada:!!(reg && reg.feita)};
+  }
+  const feita = !!(reg && reg.feita);
+  return {planejada:1, feito: feita ? 1 : 0, xp: feita ? c.xp.atividade : 0,
+          plano, automatica:false, marcada:feita};
+}
+
+/** Resumo de um dia: quanto foi planejado, quanto foi cumprido e quanto rendeu. */
+function resumoDia(data, c){
+  c = c || ciclo();
+  const ativos = habitosAtivos(c);
+  let planejadas = 0, concluidas = 0, xp = 0;
+  const itens = [];
+
+  ativos.forEach(h => {
+    const a = avaliarHabito(h, data, c);
+    planejadas += 1;
+    concluidas += a.feito;
+    xp += a.xp;
+    itens.push({habito:h, aval:a});
+  });
+
+  const at = avaliarAtividade(data, c);
+  planejadas += at.planejada;
+  concluidas += at.feito;
+  xp += at.xp;
+
+  const percent = planejadas > 0 ? (concluidas/planejadas)*100 : 0;
+  const completo = planejadas > 0 && concluidas >= planejadas;
+  if(completo) xp += c.xp.bonusDiaCompleto;
+
+  return {data, planejadas, concluidas, percent, xp, completo, itens, atividade:at};
+}
+
+/** Consistência de um conjunto de dias, contando apenas dias já vividos. */
+function resumoPeriodo(datas, c){
+  c = c || ciclo();
+  const uteis = datas.filter(d => !ehFuturo(d));
+  let planejadas = 0, concluidas = 0, xp = 0, diasCompletos = 0;
+  let habitosPlan = 0, habitosOk = 0, ativPlan = 0, ativOk = 0;
+
+  uteis.forEach(d => {
+    const r = resumoDia(d, c);
+    planejadas += r.planejadas;
+    concluidas += r.concluidas;
+    xp += r.xp;
+    if(r.completo) diasCompletos++;
+    r.itens.forEach(i => { habitosPlan++; habitosOk += i.aval.feito; });
+    ativPlan += r.atividade.planejada;
+    ativOk   += r.atividade.feito;
+  });
+
+  return {
+    dias: uteis.length,
+    planejadas, concluidas, xp, diasCompletos,
+    percent: planejadas > 0 ? (concluidas/planejadas)*100 : 0,
+    percentHabitos: habitosPlan > 0 ? (habitosOk/habitosPlan)*100 : 0,
+    percentAtividades: ativPlan > 0 ? (ativOk/ativPlan)*100 : 0,
+    ativPlan, ativOk
+  };
+}
+
+/* =========================================================================
+   6. XP, bônus e nível
+   ========================================================================= */
+/** XP total do ciclo: dias + bônus de semana + bônus de retomada. */
+function xpTotal(c){
+  c = c || ciclo();
+  const fim = fimDoCiclo(c);
+  const ate = ehFuturo(fim) ? hoje() : fim;
+  if(difDias(c.inicio, ate) < 0) return 0;
+
+  let total = 0;
+  let anteriorIncompleto = false;
+
+  for(let d = c.inicio; difDias(d, ate) >= 0; d = somaDias(d, 1)){
+    const r = resumoDia(d, c);
+    total += r.xp;
+    // Recuperar a consistência logo depois de um dia fraco vale bônus (seção 7.2).
+    if(anteriorIncompleto && r.completo) total += c.xp.bonusRetomada;
+    anteriorIncompleto = r.percent < 50;
+  }
+
+  // Bônus das semanas já encerradas.
+  for(let s = 1; s <= c.semanas; s++){
+    const dias = diasDaSemana(s, c);
+    if(ehFuturo(dias[6])) break;                 // semana ainda em curso
+    const r = resumoPeriodo(dias, c);
+    if(r.percent >= c.metaConsistencia) total += c.xp.bonusSemanaMeta;
+    if(r.percent >= 100) total += c.xp.bonusSemanaPerfeita;
+  }
+  return Math.round(total);
+}
+
+/** Níveis com exigência crescente — serve de "próximo marco" no painel. */
+function nivelDe(xp){
+  let nivel = 1, base = 0, passo = 200;
+  while(xp >= base + passo){ base += passo; nivel++; passo = Math.round(passo*1.28); }
+  return {nivel, base, proximo: base + passo, faltam: base + passo - xp,
+          razao: (xp - base) / passo};
+}
+
+/** Sequência tolerante: um dia fraco isolado não quebra; dois seguidos, sim. */
+function sequencia(c){
+  c = c || ciclo();
+  let dia = hoje();
+  // Um dia ainda em andamento não conta como falha.
+  const rHoje = resumoDia(dia, c);
+  if(rHoje.percent < 50) dia = somaDias(dia, -1);
+
+  let conta = 0, perdoados = 0;
+  while(difDias(c.inicio, dia) >= 0){
+    const r = resumoDia(dia, c);
+    if(r.percent >= 50){ conta++; }
+    else {
+      if(perdoados >= 1) break;      // segunda falha encerra a sequência
+      perdoados++;
+    }
+    dia = somaDias(dia, -1);
+  }
+  return conta;
+}
+
+/* =========================================================================
+   7. Formatação
+   ========================================================================= */
+function fmtNum(n){
+  // Arredonda antes de exibir: 116 - 117,2 dá -1,2000000000000028 em ponto flutuante.
+  const v = Math.round((Number(n) || 0) * 100) / 100;
+  return Number.isInteger(v) ? String(v) : String(v).replace('.', ',');
+}
+function pct(n){ return Math.round(n) + '%'; }
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, m =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* =========================================================================
+   8. Feedback: aviso, brilho e vibração
+   ========================================================================= */
+let avisoTimer = null;
+function avisar(texto, destaque){
+  const el = document.getElementById('aviso');
+  el.textContent = texto;
+  el.classList.toggle('volt', !!destaque);
+  el.classList.add('visivel');
+  clearTimeout(avisoTimer);
+  avisoTimer = setTimeout(() => el.classList.remove('visivel'), 2200);
+}
+function vibrar(ms){
+  if(navigator.vibrate) { try{ navigator.vibrate(ms); }catch(e){} }
+}
+function celebrar(){
+  const b = document.getElementById('brilho');
+  b.classList.remove('acende');
+  void b.offsetWidth;
+  b.classList.add('acende');
+  vibrar([12,50,22]);
+}
+
+/** Números que sobem em vez de aparecer prontos (seção 11.2). */
+function contarAte(el, alvo, sufixo){
+  const de = Number(el.dataset.valor || 0);
+  if(de === alvo){ el.textContent = alvo + (sufixo||''); return; }
+  el.dataset.valor = alvo;
+  const inicio = performance.now(), dur = 550;
+  function passo(t){
+    const p = Math.min((t - inicio)/dur, 1);
+    const suave = 1 - Math.pow(1-p, 3);
+    el.textContent = Math.round(de + (alvo-de)*suave) + (sufixo||'');
+    if(p < 1) requestAnimationFrame(passo);
+  }
+  requestAnimationFrame(passo);
+}
+
+/* Barras animam do estado anterior para o novo. */
+function pintarBarras(raiz){
+  (raiz || document).querySelectorAll('.barra i[data-alvo]').forEach(el => {
+    const alvo = Math.max(0, Math.min(100, Number(el.dataset.alvo)));
+    requestAnimationFrame(() => { el.style.width = alvo + '%'; });
+  });
+}
+
+/* =========================================================================
+   9. Navegação entre abas
+   ========================================================================= */
+let abaAtual = 'hoje';
+const RENDERIZADORES = {};
+
+function irPara(aba){
+  abaAtual = aba;
+  ['hoje','semana','progresso','ajustes'].forEach(a => {
+    document.getElementById('v-'+a).classList.toggle('oculto', a !== aba);
+  });
+  document.querySelectorAll('nav button').forEach(b => {
+    b.classList.toggle('ativo', b.dataset.aba === aba);
+  });
+  RENDERIZADORES[aba]();
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+document.querySelectorAll('nav button').forEach(b => {
+  b.addEventListener('click', () => { vibrar(8); irPara(b.dataset.aba); });
+});
+
+/* =========================================================================
+   10. Aba HOJE — o dashboard (seção 9)
+   ========================================================================= */
+RENDERIZADORES.hoje = function(){
+  const c = ciclo();
+  const data = hoje();
+  const dentro = semanaDoCiclo(data, c) !== null;
+  const r = resumoDia(data, c);
+  const semana = semanaDoCiclo(data, c) || 1;
+  const rSemana = resumoPeriodo(diasDaSemana(semana, c), c);
+  const diaDoCiclo = difDias(c.inicio, data) + 1;
+  const totalDias = totalDiasCiclo(c);
+  const progressoCiclo = Math.max(0, Math.min(100, (diaDoCiclo/totalDias)*100));
+  const seq = sequencia(c);
+  const xp = xpTotal(c);
+  const nv = nivelDe(xp);
+
+  const hora = new Date().getHours();
+  const saudacao = hora < 5 ? 'Boa madrugada' : hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+
+  const at = r.atividade;
+  const faltam = Math.max(0, Math.ceil(r.planejadas - r.concluidas));
+
+  const alvo = document.getElementById('v-hoje');
+  alvo.innerHTML = `
+    ${!dentro ? `<div class="card"><div class="vazio">
+        Hoje está fora do período do ciclo <b>${esc(c.nome)}</b>.<br>
+        Ajuste as datas em <b>Ajustes → Ciclo</b> para continuar registrando.
+      </div></div>` : ''}
+
+    <div class="heroi">
+      <p class="saudacao">${saudacao}.</p>
+      <p class="data">${esc(dataLonga(data))} · Semana ${semana} de ${c.semanas}</p>
+      <div class="heroi-linha">
+        <div>
+          <p class="grande"><span id="pct-dia" data-valor="0">0%</span></p>
+          <p class="legenda">${r.completo
+            ? 'Dia completo. Excelente trabalho.'
+            : faltam === 0 ? 'Tudo pronto por aqui.'
+            : faltam === 1 ? 'Falta 1 ação para fechar o dia.'
+            : `Faltam ${faltam} ações para fechar o dia.`}</p>
+        </div>
+      </div>
+      <div style="margin-top:14px;position:relative;z-index:1">
+        <div class="barra"><i data-alvo="${r.percent}"></i></div>
+      </div>
+      <div class="selo">
+        <span class="${seq > 0 ? 'aceso' : ''}">🔥 <b>${seq}</b> ${seq === 1 ? 'dia seguido' : 'dias seguidos'}</span>
+        <span class="aceso">⚡ <b>${xp}</b> XP</span>
+        <span>Nível <b>${nv.nivel}</b></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo">
+        <h2>Atividade de hoje</h2>
+        <button class="btn pequeno" id="btn-trocar-atividade">Trocar</button>
+      </div>
+      <div class="atividade ${at.marcada || at.automatica ? 'feita' : ''}">
+        <div class="emoji">${at.plano.emoji}</div>
+        <div class="txt">
+          <b>${esc(at.plano.nome)}</b>
+          <span>${at.automatica
+            ? 'Descanso programado faz parte do plano'
+            : at.marcada ? `Realizada · +${c.xp.atividade} XP` : `Vale ${c.xp.atividade} XP`}${at.plano.excecao ? ' · ajuste do dia' : ''}</span>
+        </div>
+        ${at.automatica ? '' : `
+          <button class="marcador ${at.marcada ? 'feito' : ''}" id="btn-atividade" aria-label="Marcar atividade">
+            <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg>
+          </button>`}
+      </div>
+      ${at.automatica ? `
+        <div class="acoes-atividade">
+          <button class="btn pequeno" id="btn-extra">+ Registrar treino leve</button>
+        </div>` : ''}
+      ${(registro(data).extras || []).length ? `
+        <div style="margin-top:10px">
+          ${registro(data).extras.map((e,i) => `
+            <div class="item-lista">
+              <div class="emoji">${e.emoji || '⭐'}</div>
+              <div class="info"><b>${esc(e.nome)}</b><span>Atividade adicional</span></div>
+              <button class="btn-icone" data-remove-extra="${i}" aria-label="Remover">
+                <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 14H7zM9 4h6l1 2H8z"/></svg>
+              </button>
+            </div>`).join('')}
+        </div>` : ''}
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Hábitos do dia</h2>
+        <span class="rotulo">${r.itens.filter(i => i.aval.feito >= 1).length}/${r.itens.length}</span></div>
+      <div id="lista-habitos">${r.itens.map(i => htmlHabito(i, c, data)).join('') ||
+        '<div class="vazio">Nenhum hábito ativo. Crie o primeiro em Ajustes.</div>'}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Progresso geral</h2></div>
+      <div class="barra-item">
+        <div class="barra-topo"><span class="rotulo">Semana ${semana}</span>
+          <b>${pct(rSemana.percent)} <small style="color:var(--cinza-2);font-weight:600">/ meta ${c.metaConsistencia}%</small></b></div>
+        <div class="barra fina ${rSemana.percent >= c.metaConsistencia ? 'verde' : ''}"><i data-alvo="${rSemana.percent}"></i></div>
+      </div>
+      <div class="barra-item">
+        <div class="barra-topo"><span class="rotulo">Ciclo</span>
+          <b>Dia ${Math.max(0,Math.min(diaDoCiclo,totalDias))} de ${totalDias}</b></div>
+        <div class="barra fina"><i data-alvo="${progressoCiclo}"></i></div>
+      </div>
+      <div class="barra-item">
+        <div class="barra-topo"><span class="rotulo">Próximo nível</span>
+          <b>${nv.faltam} XP para o nível ${nv.nivel+1}</b></div>
+        <div class="barra fina"><i data-alvo="${nv.razao*100}"></i></div>
+      </div>
+    </div>
+  `;
+
+  contarAte(document.getElementById('pct-dia'), Math.round(r.percent), '%');
+  pintarBarras(alvo);
+  ligarEventosHoje(c, data);
+  atualizarTopo();
+};
+
+function htmlHabito({habito:h, aval:a}, c, data){
+  const classe = a.feito >= 1 ? 'feito' : (a.feito > 0 || (h.tipo==='quantidade' && a.razao > 0) ? 'parcial' : '');
+  let controle = '';
+  if(h.tipo === 'quantidade'){
+    controle = `<div class="contador">
+        <button data-qtd="${h.id}" data-delta="-1" aria-label="Diminuir">−</button>
+        <button data-qtd="${h.id}" data-delta="1" aria-label="Aumentar">+</button>
+      </div>`;
+  } else if(h.tipo === 'sono'){
+    controle = `<button class="btn pequeno" data-sono="${h.id}">${a.valor ? 'Editar' : 'Registrar'}</button>`;
+  } else {
+    controle = `<button class="marcador ${a.feito ? 'feito' : ''}" data-check="${h.id}" aria-label="Marcar ${esc(h.nome)}">
+        <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg>
+      </button>`;
+  }
+  return `
+    <div class="habito ${classe}" data-linha="${h.id}">
+      <div class="emoji">${h.emoji || '•'}</div>
+      <div class="info">
+        <b>${esc(h.nome)}</b>
+        <span>${esc(a.texto || h.detalhe || '')}</span>
+        ${h.tipo === 'quantidade' ? `
+          <div class="habito-progresso barra fina ${a.feito ? 'verde' : ''}">
+            <i data-alvo="${a.razao*100}"></i></div>` : ''}
+      </div>
+      ${controle}
+    </div>`;
+}
+
+function ligarEventosHoje(c, data){
+  const alvo = document.getElementById('v-hoje');
+
+  alvo.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.check;
+    const reg = registro(data);
+    reg.habitos[id] = !reg.habitos[id];
+    salvar();
+    const antes = resumoDia(data, c);
+    vibrar(reg.habitos[id] ? 14 : 8);
+    if(reg.habitos[id]){
+      const h = c.habitos.find(x => x.id === id);
+      avisar(`+${h.xp} XP · ${h.nome}`, true);
+    }
+    RENDERIZADORES.hoje();
+    marcarPulso(id);
+    if(antes.completo) celebrar();
+  }));
+
+  alvo.querySelectorAll('[data-qtd]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.qtd;
+    const h = c.habitos.find(x => x.id === id);
+    const passo = Number(h.passo) || 0.25;
+    const reg = registro(data);
+    const atual = Number(reg.habitos[id]) || 0;
+    const novo = Math.max(0, Math.round((atual + passo*Number(b.dataset.delta)) * 100) / 100);
+    const cruzouMeta = atual < h.meta && novo >= h.meta;
+    reg.habitos[id] = novo;
+    salvar();
+    vibrar(8);
+    if(cruzouMeta) avisar(`Meta de ${h.nome.toLowerCase()} atingida · +${h.xp} XP`, true);
+    const antes = resumoDia(data, c);
+    RENDERIZADORES.hoje();
+    marcarPulso(id);
+    if(cruzouMeta && antes.completo) celebrar();
+  }));
+
+  alvo.querySelectorAll('[data-sono]').forEach(b => b.addEventListener('click', () => abrirSono(data)));
+
+  const btnAt = document.getElementById('btn-atividade');
+  if(btnAt) btnAt.addEventListener('click', () => {
+    const reg = registro(data);
+    const plano = atividadePlanejada(data, c);
+    reg.atividade = {feita: !(reg.atividade && reg.atividade.feita), tipo: plano.tipo};
+    salvar();
+    vibrar(16);
+    if(reg.atividade.feita) avisar(`${plano.nome} concluída · +${c.xp.atividade} XP`, true);
+    const antes = resumoDia(data, c);
+    RENDERIZADORES.hoje();
+    if(antes.completo) celebrar();
+  });
+
+  const btnTrocar = document.getElementById('btn-trocar-atividade');
+  if(btnTrocar) btnTrocar.addEventListener('click', () => abrirTrocaAtividade(data));
+
+  const btnExtra = document.getElementById('btn-extra');
+  if(btnExtra) btnExtra.addEventListener('click', () => abrirExtra(data));
+
+  alvo.querySelectorAll('[data-remove-extra]').forEach(b => b.addEventListener('click', () => {
+    registro(data).extras.splice(Number(b.dataset.removeExtra), 1);
+    salvar(); RENDERIZADORES.hoje();
+  }));
+}
+
+function marcarPulso(id){
+  const linha = document.querySelector(`[data-linha="${id}"]`);
+  if(linha){ linha.classList.add('pulsa'); setTimeout(() => linha.classList.remove('pulsa'), 420); }
+}
+
+function atualizarTopo(){
+  const c = ciclo();
+  const xp = xpTotal(c);
+  const nv = nivelDe(xp);
+  contarAte(document.getElementById('xp-topo'), xp, '');
+  document.getElementById('nivel-topo').textContent = 'Nível ' + nv.nivel;
+  const s = semanaDoCiclo(hoje(), c);
+  document.getElementById('rodape-ciclo').textContent =
+    `${c.nome}${s ? ' · Semana ' + s + '/' + c.semanas : ''}`;
+}
+
+/* =========================================================================
+   11. Aba SEMANA — agenda e fechamento de rodada (seções 4 e 5)
+   ========================================================================= */
+let semanaVista = null;
+
+RENDERIZADORES.semana = function(){
+  const c = ciclo();
+  if(semanaVista === null) semanaVista = semanaDoCiclo(hoje(), c) || 1;
+  const s = Math.min(Math.max(semanaVista, 1), c.semanas);
+  const dias = diasDaSemana(s, c);
+  const r = resumoPeriodo(dias, c);
+  const anterior = s > 1 ? resumoPeriodo(diasDaSemana(s-1, c), c) : null;
+  const encerrada = !ehFuturo(dias[6]);
+  const bateuMeta = r.percent >= c.metaConsistencia;
+
+  const alvo = document.getElementById('v-semana');
+  alvo.innerHTML = `
+    <div class="card" style="margin-top:16px">
+      <div class="card-titulo">
+        <button class="btn-icone" id="sem-ant" ${s <= 1 ? 'disabled style="opacity:.35"' : ''} aria-label="Semana anterior">
+          <svg viewBox="0 0 24 24"><path d="M15 4 7 12l8 8z"/></svg></button>
+        <h2 style="flex:1;text-align:center">Semana ${s} de ${c.semanas}</h2>
+        <button class="btn-icone" id="sem-prox" ${s >= c.semanas ? 'disabled style="opacity:.35"' : ''} aria-label="Próxima semana">
+          <svg viewBox="0 0 24 24"><path d="M9 4l8 8-8 8z"/></svg></button>
+      </div>
+      <p style="text-align:center;color:var(--cinza-2);font-size:.76rem;margin:-4px 0 14px;
+        letter-spacing:.06em;text-transform:uppercase">${dataCurta(dias[0])} — ${dataCurta(dias[6])}</p>
+      <div class="tira">${dias.map(d => htmlDiaAgenda(d, c)).join('')}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo">
+        <h2>${encerrada ? 'Fechamento da rodada' : 'Rodada em andamento'}</h2>
+        <span class="rotulo">${r.dias} ${r.dias === 1 ? 'dia' : 'dias'}</span>
+      </div>
+      <div class="heroi" style="margin-top:0;padding:16px">
+        <p class="rotulo">Consistência</p>
+        <p class="grande" style="font-size:3rem">${pct(r.percent)}
+          ${anterior && anterior.dias ? `<small class="delta ${r.percent >= anterior.percent ? 'sobe' : 'desce'}">
+            ${r.percent >= anterior.percent ? '▲' : '▼'} ${Math.abs(Math.round(r.percent - anterior.percent))} pts</small>` : ''}</p>
+        <p class="legenda">${textoConsistencia(r, c, encerrada)}</p>
+        <div style="margin-top:12px;position:relative;z-index:1">
+          <div class="barra ${bateuMeta ? 'verde' : ''}"><i data-alvo="${r.percent}"></i></div>
+        </div>
+      </div>
+      <div class="grade" style="margin-top:12px">
+        <div class="bloco-num"><b>${pct(r.percentHabitos)}</b><small>Hábitos</small></div>
+        <div class="bloco-num"><b>${r.ativPlan ? pct(r.percentAtividades) : '—'}</b><small>Atividades</small></div>
+        <div class="bloco-num verde"><b>${r.diasCompletos}</b><small>Dias completos</small></div>
+        <div class="bloco-num volt"><b>${Math.round(r.xp)}</b><small>XP na semana</small></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Como foi cada hábito</h2></div>
+      ${htmlHabitosDaSemana(dias, c)}
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Sono, água e peso</h2></div>
+      ${htmlIndicadoresSemana(dias, c, anterior, s)}
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Destaques e ajustes</h2></div>
+      ${htmlNotas(dias, c, r, anterior)}
+    </div>
+  `;
+
+  pintarBarras(alvo);
+  const ant = document.getElementById('sem-ant'), prox = document.getElementById('sem-prox');
+  if(ant)  ant.addEventListener('click',  () => { if(s > 1){ semanaVista = s-1; RENDERIZADORES.semana(); } });
+  if(prox) prox.addEventListener('click', () => { if(s < c.semanas){ semanaVista = s+1; RENDERIZADORES.semana(); } });
+  alvo.querySelectorAll('[data-dia]').forEach(b =>
+    b.addEventListener('click', () => abrirTrocaAtividade(b.dataset.dia)));
+  atualizarTopo();
+};
+
+function htmlDiaAgenda(d, c){
+  const plano = atividadePlanejada(d, c);
+  const r = resumoDia(d, c);
+  const futuro = ehFuturo(d);
+  const dt = deIso(d);
+  const raio = 9, circ = 2*Math.PI*raio;
+  const razao = futuro ? 0 : Math.min(r.percent/100, 1);
+  return `
+    <button class="dia ${d === hoje() ? 'hoje' : ''} ${futuro ? 'futuro' : ''}" data-dia="${d}">
+      <div class="dsem">${DIAS_CURTOS[dt.getDay()]}</div>
+      <div class="dnum">${String(dt.getDate()).padStart(2,'0')}</div>
+      <div class="demoji">${plano.emoji}</div>
+      <svg class="anel" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="${raio}" fill="none" stroke="#2a2a2a" stroke-width="3"/>
+        <circle cx="12" cy="12" r="${raio}" fill="none" stroke="${razao >= 1 ? '#25c26e' : '#d7ff2e'}"
+          stroke-width="3" stroke-linecap="round" stroke-dasharray="${circ}"
+          stroke-dashoffset="${circ*(1-razao)}" transform="rotate(-90 12 12)"/>
+      </svg>
+    </button>`;
+}
+
+function textoConsistencia(r, c, encerrada){
+  if(!r.dias) return 'A semana ainda não começou.';
+  if(r.percent >= c.metaConsistencia)
+    return encerrada ? 'Semana concluída com sucesso. Meta batida.' : 'Acima da meta. Segue firme.';
+  if(r.percent >= c.metaConsistencia - 15)
+    return encerrada ? 'Perto da meta. Boa base para a próxima rodada.' : 'Perto da meta — dá para fechar.';
+  return encerrada ? 'Semana de retomada. A próxima começa do zero.' : 'Ainda dá tempo de recuperar.';
+}
+
+function htmlHabitosDaSemana(dias, c){
+  const uteis = dias.filter(d => !ehFuturo(d));
+  if(!uteis.length) return '<div class="vazio">Semana ainda por vir.</div>';
+  const ativos = habitosAtivos(c);
+  if(!ativos.length) return '<div class="vazio">Nenhum hábito ativo.</div>';
+  return ativos.map(h => {
+    const soma = uteis.reduce((a,d) => a + avaliarHabito(h, d, c).feito, 0);
+    const p = (soma/uteis.length)*100;
+    return `
+      <div class="barra-item">
+        <div class="barra-topo">
+          <span style="font-size:.85rem;font-weight:600">${h.emoji} ${esc(h.nome)}</span>
+          <b>${pct(p)}</b>
+        </div>
+        <div class="barra fina ${p >= 100 ? 'verde' : p < 60 ? 'ambar' : ''}"><i data-alvo="${p}"></i></div>
+      </div>`;
+  }).join('');
+}
+
+function htmlIndicadoresSemana(dias, c, anterior, s){
+  const uteis = dias.filter(d => !ehFuturo(d));
+  const hAgua = c.habitos.find(h => h.tipo === 'quantidade' && h.ativo);
+  const hSono = c.habitos.find(h => h.tipo === 'sono' && h.ativo);
+
+  let linhas = '';
+
+  if(hSono){
+    const regs = uteis.map(d => registro(d).habitos[hSono.id]).filter(v => v && v.deitar);
+    const meta = metaSono(dias[0], c);
+    if(regs.length){
+      const media = regs.reduce((a,v) => a + minutosNoite(v.deitar), 0)/regs.length;
+      const hh = Math.floor(media/60) % 24, mm = Math.round(media % 60);
+      const horas = regs.filter(v => v.horas).map(v => Number(v.horas));
+      const mediaHoras = horas.length ? horas.reduce((a,b)=>a+b,0)/horas.length : null;
+      linhas += linhaRel('Horário médio de deitar',
+        `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`);
+      linhas += linhaRel('Meta da semana', meta || '—');
+      if(mediaHoras !== null) linhas += linhaRel('Sono médio por noite', fmtNum(mediaHoras) + ' h');
+      linhas += linhaRel('Noites registradas', `${regs.length} de ${uteis.length}`);
+    } else {
+      linhas += linhaRel('Sono', 'Sem registros nesta semana');
+    }
+  }
+
+  if(hAgua){
+    const vals = uteis.map(d => Number(registro(d).habitos[hAgua.id]) || 0);
+    const media = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+    const bateu = vals.filter(v => v >= hAgua.meta).length;
+    linhas += linhaRel('Média de água por dia', `${fmtNum(media)} ${hAgua.unidade}`);
+    linhas += linhaRel('Dias na meta de água', `${bateu} de ${uteis.length}`);
+  }
+
+  const pesagensSemana = dados.pesagens
+    .filter(p => dias.includes(p.data))
+    .sort((a,b) => a.data.localeCompare(b.data));
+  const ultimaAntes = dados.pesagens
+    .filter(p => difDias(p.data, dias[0]) > 0)
+    .sort((a,b) => b.data.localeCompare(a.data))[0];
+  if(pesagensSemana.length){
+    const p = pesagensSemana[pesagensSemana.length-1];
+    const dif = ultimaAntes ? p.peso - ultimaAntes.peso : null;
+    linhas += linhaRel('Peso da semana', `${fmtNum(p.peso)} kg`,
+      dif === null ? null : {valor: dif, inverter:true});
+  } else {
+    linhas += linhaRel('Peso da semana', 'Sem pesagem registrada');
+  }
+
+  return linhas || '<div class="vazio">Sem indicadores nesta semana.</div>';
+}
+
+function linhaRel(rotulo, valor, delta){
+  let d = '';
+  if(delta && delta.valor !== null && !isNaN(delta.valor)){
+    const bom = delta.inverter ? delta.valor <= 0 : delta.valor >= 0;
+    const sinal = delta.valor > 0 ? '+' : '';
+    d = `<span class="delta ${bom ? 'sobe' : 'desce'}">${sinal}${fmtNum(delta.valor)}</span>`;
+  }
+  return `<div class="linha-relatorio"><span>${esc(rotulo)}</span><b>${esc(valor)}${d}</b></div>`;
+}
+
+function htmlNotas(dias, c, r, anterior){
+  const uteis = dias.filter(d => !ehFuturo(d));
+  if(!uteis.length) return '<div class="vazio">O relatório aparece conforme a semana avança.</div>';
+  const notas = [];
+  const ativos = habitosAtivos(c);
+
+  const taxas = ativos.map(h => ({
+    h, p: (uteis.reduce((a,d) => a + avaliarHabito(h, d, c).feito, 0)/uteis.length)*100
+  })).sort((a,b) => b.p - a.p);
+
+  // Com um ou dois dias vividos ainda não há padrão: apontar "hábito fraco"
+  // no começo da semana seria cobrança, não leitura de dados.
+  const maduro = uteis.length >= 3;
+
+  if(maduro && taxas.length && taxas[0].p >= 80)
+    notas.push({tipo:'bom', ico:'🏅', txt:`<b>${esc(taxas[0].h.nome)}</b> foi o hábito mais firme da semana, com ${pct(taxas[0].p)} de cumprimento.`});
+  if(r.diasCompletos >= 3)
+    notas.push({tipo:'bom', ico:'🔥', txt:`<b>${r.diasCompletos} dias completos</b> nesta rodada. É isso que sustenta o ciclo.`});
+  if(anterior && anterior.dias && r.percent > anterior.percent)
+    notas.push({tipo:'bom', ico:'📈', txt:`Consistência <b>${Math.round(r.percent - anterior.percent)} pontos acima</b> da semana anterior.`});
+  if(r.percent >= c.metaConsistencia)
+    notas.push({tipo:'bom', ico:'🎯', txt:`Meta de ${c.metaConsistencia}% <b>batida</b>. Bônus de ${c.xp.bonusSemanaMeta} XP garantido no fechamento.`});
+
+  if(maduro){
+    const fraco = taxas[taxas.length-1];
+    if(fraco && fraco.p < 70)
+      notas.push({tipo:'ajuste', ico:'🔧', txt:`<b>${esc(fraco.h.nome)}</b> ficou em ${pct(fraco.p)}. Vale rever o horário ou reduzir a meta no próximo ciclo.`});
+    if(r.ativPlan && r.percentAtividades < 70)
+      notas.push({tipo:'ajuste', ico:'👟', txt:`As atividades programadas ficaram em ${pct(r.percentAtividades)}. Talvez a agenda esteja mais cheia do que a semana permite.`});
+  }
+  if(!notas.length)
+    notas.push({tipo:'', ico:'✨', txt:'Semana em construção. Cada registro melhora o relatório.'});
+
+  return notas.map(n => `<div class="nota ${n.tipo}"><span class="ico">${n.ico}</span><div>${n.txt}</div></div>`).join('');
+}
+
+/* =========================================================================
+   12. Aba PROGRESSO — resultado: peso, medidas, ciclo (seções 6 e 19)
+   ========================================================================= */
+RENDERIZADORES.progresso = function(){
+  const c = ciclo();
+  const dias = Array.from({length: totalDiasCiclo(c)}, (_,i) => somaDias(c.inicio, i));
+  const r = resumoPeriodo(dias, c);
+  const xp = xpTotal(c);
+  const pesagens = dados.pesagens.slice().sort((a,b) => a.data.localeCompare(b.data));
+  const primeiro = pesagens[0];
+  const ultimo = pesagens[pesagens.length-1];
+  const variacao = (primeiro && ultimo && pesagens.length > 1) ? ultimo.peso - primeiro.peso : null;
+  const diaDoCiclo = Math.max(0, Math.min(difDias(c.inicio, hoje()) + 1, totalDiasCiclo(c)));
+
+  const semanas = [];
+  for(let s = 1; s <= c.semanas; s++){
+    const rs = resumoPeriodo(diasDaSemana(s, c), c);
+    semanas.push({s, ...rs});
+  }
+
+  const alvo = document.getElementById('v-progresso');
+  alvo.innerHTML = `
+    <div class="card" style="margin-top:16px">
+      <div class="card-titulo"><h2>${esc(c.nome)}</h2>
+        <span class="rotulo">Dia ${diaDoCiclo}/${totalDiasCiclo(c)}</span></div>
+      <p style="color:var(--cinza);font-size:.86rem;margin:0 0 14px">${esc(c.objetivo || '')}</p>
+      <div class="barra"><i data-alvo="${(diaDoCiclo/totalDiasCiclo(c))*100}"></i></div>
+      <div class="grade" style="margin-top:14px">
+        <div class="bloco-num volt"><b>${pct(r.percent)}</b><small>Consistência</small></div>
+        <div class="bloco-num"><b>${xp}</b><small>XP total</small></div>
+        <div class="bloco-num verde"><b>${r.diasCompletos}</b><small>Dias completos</small></div>
+        <div class="bloco-num"><b>${sequencia(c)}</b><small>Sequência</small></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Consistência por semana</h2></div>
+      ${semanas.map(s => `
+        <div class="barra-item">
+          <div class="barra-topo"><span class="rotulo">Semana ${s.s}</span>
+            <b>${s.dias ? pct(s.percent) : '—'}</b></div>
+          <div class="barra fina ${s.percent >= c.metaConsistencia ? 'verde' : ''}"><i data-alvo="${s.dias ? s.percent : 0}"></i></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Peso</h2>
+        <button class="btn pequeno volt" id="btn-pesar">Registrar</button></div>
+      ${pesagens.length ? `
+        <div class="grade tres" style="margin-bottom:14px">
+          <div class="bloco-num"><b>${fmtNum(primeiro.peso)}</b><small>kg inicial</small></div>
+          <div class="bloco-num"><b>${fmtNum(ultimo.peso)}</b><small>kg atual</small></div>
+          <div class="bloco-num ${variacao !== null && variacao <= 0 ? 'verde' : ''}">
+            <b>${variacao === null ? '—' : (variacao > 0 ? '+' : '') + fmtNum(variacao)}</b><small>kg variação</small></div>
+        </div>
+        ${grafico(pesagens.map(p => ({x:p.data, y:p.peso})))}
+        <div style="margin-top:12px">
+          ${pesagens.slice().reverse().map((p,i) => `
+            <div class="linha-relatorio">
+              <span>${dataCurta(p.data)}${p.gordura ? ` · ${fmtNum(p.gordura)}% gordura` : ''}</span>
+              <b>${fmtNum(p.peso)} kg
+                <button class="btn-icone" style="width:28px;height:28px;display:inline-grid;vertical-align:middle;margin-left:8px"
+                  data-del-peso="${pesagens.length-1-i}" aria-label="Remover">
+                  <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 14H7zM9 4h6l1 2H8z"/></svg></button>
+              </b>
+            </div>`).join('')}
+        </div>`
+        : `<div class="vazio">Nenhuma pesagem ainda.<br>
+             Referência do início do projeto: <b>${fmtNum(c.pesoReferencia)} kg</b>.<br>
+             ${c.pesagem.ativa ? `Pesagem semanal sugerida: <b>${DIAS_LONGOS[c.pesagem.diaSemana]}</b>.` : ''}</div>`}
+      <p style="color:var(--cinza-2);font-size:.76rem;margin:14px 0 0;line-height:1.5">
+        Os hábitos são o jogo. O peso é o placar da temporada — acompanhe a tendência, não o número do dia.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Medidas</h2>
+        <button class="btn pequeno" id="btn-medir">Registrar</button></div>
+      ${dados.medidas.length ? dados.medidas.slice().sort((a,b)=>b.data.localeCompare(a.data)).map((m,i) => `
+          <div class="linha-relatorio">
+            <span>${dataCurta(m.data)}</span>
+            <b>${Object.entries(m.valores).filter(([,v]) => v).map(([k,v]) => `${esc(k)} ${fmtNum(v)}`).join(' · ') || '—'}
+              <button class="btn-icone" style="width:28px;height:28px;display:inline-grid;vertical-align:middle;margin-left:8px"
+                data-del-medida="${i}" aria-label="Remover">
+                <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 14H7zM9 4h6l1 2H8z"/></svg></button>
+            </b>
+          </div>`).join('')
+        : `<div class="vazio">Nenhuma medida registrada.<br>Acompanhando: ${dados.medidas.length ? '' : esc(c.medidas.join(', ') || '—')}</div>`}
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Histórico de dias</h2></div>
+      <div id="historico">${htmlHistorico(c)}</div>
+    </div>
+  `;
+
+  pintarBarras(alvo);
+  document.getElementById('btn-pesar').addEventListener('click', () => abrirPesagem());
+  document.getElementById('btn-medir').addEventListener('click', () => abrirMedidas());
+  alvo.querySelectorAll('[data-del-peso]').forEach(b => b.addEventListener('click', () => {
+    const ordenadas = dados.pesagens.slice().sort((a,b) => a.data.localeCompare(b.data));
+    const p = ordenadas[Number(b.dataset.delPeso)];
+    dados.pesagens = dados.pesagens.filter(x => x !== p);
+    salvar(); RENDERIZADORES.progresso(); avisar('Pesagem removida.');
+  }));
+  alvo.querySelectorAll('[data-del-medida]').forEach(b => b.addEventListener('click', () => {
+    const ordenadas = dados.medidas.slice().sort((a,b)=>b.data.localeCompare(a.data));
+    const m = ordenadas[Number(b.dataset.delMedida)];
+    dados.medidas = dados.medidas.filter(x => x !== m);
+    salvar(); RENDERIZADORES.progresso(); avisar('Medida removida.');
+  }));
+  alvo.querySelectorAll('[data-hist]').forEach(b =>
+    b.addEventListener('click', () => abrirDia(b.dataset.hist)));
+  atualizarTopo();
+};
+
+/** Gráfico de linha simples, sem biblioteca externa. */
+function grafico(pontos){
+  if(pontos.length < 2) return '<div class="vazio">Duas medições ou mais desenham a tendência.</div>';
+  const L = 300, A = 110, pad = 14;
+  const ys = pontos.map(p => p.y);
+  const min = Math.min(...ys), max = Math.max(...ys);
+  const faixa = (max - min) || 1;
+  const px = i => pad + (i/(pontos.length-1))*(L - pad*2);
+  const py = v => pad + (1 - (v - min)/faixa)*(A - pad*2);
+  const linha = pontos.map((p,i) => `${px(i).toFixed(1)},${py(p.y).toFixed(1)}`).join(' ');
+  const area = `${pad},${A-pad} ${linha} ${(L-pad)},${A-pad}`;
+  return `
+    <svg class="grafico" viewBox="0 0 ${L} ${A}" preserveAspectRatio="none" role="img" aria-label="Evolução">
+      <polygon points="${area}" fill="rgba(215,255,46,.10)"/>
+      <polyline points="${linha}" fill="none" stroke="#d7ff2e" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      ${pontos.map((p,i) => `<circle cx="${px(i).toFixed(1)}" cy="${py(p.y).toFixed(1)}" r="3"
+        fill="#0a0a0a" stroke="#d7ff2e" stroke-width="2"/>`).join('')}
+    </svg>`;
+}
+
+function htmlHistorico(c){
+  const dias = [];
+  for(let d = c.inicio; difDias(d, hoje()) >= 0 && difDias(c.inicio, d) < totalDiasCiclo(c); d = somaDias(d, 1)) dias.push(d);
+  if(!dias.length) return '<div class="vazio">O ciclo ainda não começou.</div>';
+  return dias.reverse().map(d => {
+    const r = resumoDia(d, c);
+    const plano = atividadePlanejada(d, c);
+    return `
+      <button class="item-lista" data-hist="${d}" style="width:100%;text-align:left">
+        <div class="emoji">${plano.emoji}</div>
+        <div class="info">
+          <b>${esc(dataLonga(d))}</b>
+          <span>${esc(plano.nome)} · ${Math.round(r.concluidas*10)/10}/${r.planejadas} ações · ${Math.round(r.xp)} XP</span>
+        </div>
+        <b style="font-size:.95rem;color:${r.completo ? 'var(--verde)' : r.percent >= 50 ? 'var(--volt)' : 'var(--cinza-2)'}">${pct(r.percent)}</b>
+      </button>`;
+  }).join('');
+}
+
+/* =========================================================================
+   13. Aba AJUSTES — painel de configuração (seção 13)
+   ========================================================================= */
+RENDERIZADORES.ajustes = function(){
+  const c = ciclo();
+  const alvo = document.getElementById('v-ajustes');
+  alvo.innerHTML = `
+    <div class="card" style="margin-top:16px">
+      <div class="card-titulo"><h2>Ciclo</h2></div>
+      <label class="campo"><span>Nome</span><input type="text" id="cfg-nome" value="${esc(c.nome)}"></label>
+      <label class="campo"><span>Objetivo</span><textarea id="cfg-objetivo" rows="2">${esc(c.objetivo)}</textarea></label>
+      <div class="dupla">
+        <label class="campo"><span>Início</span><input type="date" id="cfg-inicio" value="${c.inicio}"></label>
+        <label class="campo"><span>Semanas</span><input type="number" id="cfg-semanas" min="1" max="52" value="${c.semanas}"></label>
+      </div>
+      <div class="dupla">
+        <label class="campo"><span>Meta de consistência (%)</span>
+          <input type="number" id="cfg-meta" min="1" max="100" value="${c.metaConsistencia}"></label>
+        <label class="campo"><span>Fim (calculado)</span>
+          <input type="text" value="${dataCurta(fimDoCiclo(c))}" disabled style="opacity:.6"></label>
+      </div>
+      <button class="btn volt bloco" id="cfg-salvar-ciclo" style="margin-top:16px">Salvar ciclo</button>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Hábitos</h2>
+        <button class="btn pequeno volt" id="btn-novo-habito">+ Novo</button></div>
+      ${c.habitos.map(h => `
+        <div class="item-lista ${h.ativo ? '' : 'pausado'}">
+          <div class="emoji">${h.emoji || '•'}</div>
+          <div class="info">
+            <b>${esc(h.nome)}</b>
+            <span>${rotuloTipo(h)} · ${h.xp} XP${h.ativo ? '' : ' · pausado'}</span>
+          </div>
+          <button class="btn-icone" data-edit-habito="${h.id}" aria-label="Editar">
+            <svg viewBox="0 0 24 24"><path d="m3 17.25 11-11 3.75 3.75-11 11H3zM17.7 3.3a1 1 0 0 1 1.4 0l1.6 1.6a1 1 0 0 1 0 1.4l-1.6 1.6L15.4 4.9z"/></svg>
+          </button>
+        </div>`).join('')}
+      <p style="color:var(--cinza-2);font-size:.76rem;margin:12px 0 0;line-height:1.5">
+        Criar um hábito novo (proteína, alongamento, leitura) não exige alterar o aplicativo.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Agenda semanal</h2></div>
+      ${[0,1,2,3,4,5,6].map(i => `
+        <div class="interruptor">
+          <span style="font-weight:600">${DIAS_LONGOS[i]}</span>
+          <select data-agenda="${i}" style="width:auto;min-width:170px">
+            ${Object.entries(TIPOS_ATIVIDADE).filter(([k]) => k !== 'custom').map(([k,v]) =>
+              `<option value="${k}" ${(c.agenda[i]||{}).tipo === k ? 'selected' : ''}>${v.emoji} ${v.nome}</option>`).join('')}
+          </select>
+        </div>`).join('')}
+      <p style="color:var(--cinza-2);font-size:.76rem;margin:12px 0 0;line-height:1.5">
+        Este é o padrão da semana. Para mudar um único dia sem mexer no resto, toque no dia na aba Semana.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Sono</h2></div>
+      ${Array.from({length:c.semanas}, (_,i) => `
+        <div class="interruptor">
+          <span style="font-weight:600">Semana ${i+1} — na cama até</span>
+          <input type="time" data-sono-semana="${i}" value="${(c.metasSono||[])[i] || '00:00'}" style="width:auto">
+        </div>`).join('')}
+      <label class="campo"><span>Tolerância ainda contada como “perto da meta” (min)</span>
+        <input type="number" id="cfg-tolerancia" min="0" max="120" value="${c.toleranciaSono}"></label>
+      <button class="btn bloco" id="cfg-salvar-sono" style="margin-top:14px">Salvar sono</button>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Pesagem e medidas</h2></div>
+      <div class="interruptor">
+        <span style="font-weight:600">Pesagem semanal</span>
+        <div class="chave ${c.pesagem.ativa ? 'on' : ''}" id="chave-pesagem" role="switch"
+          aria-checked="${c.pesagem.ativa}" tabindex="0"></div>
+      </div>
+      <div class="interruptor">
+        <span style="font-weight:600">Dia da pesagem</span>
+        <select id="cfg-dia-pesagem" style="width:auto;min-width:150px">
+          ${DIAS_LONGOS.map((d,i) => `<option value="${i}" ${c.pesagem.diaSemana === i ? 'selected' : ''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <label class="campo"><span>Medidas acompanhadas (separadas por vírgula)</span>
+        <input type="text" id="cfg-medidas" value="${esc(c.medidas.join(', '))}"></label>
+      <button class="btn bloco" id="cfg-salvar-peso" style="margin-top:14px">Salvar</button>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Regras de XP</h2></div>
+      <div class="dupla">
+        <label class="campo"><span>Atividade realizada</span><input type="number" id="xp-atividade" value="${c.xp.atividade}"></label>
+        <label class="campo"><span>Dia completo</span><input type="number" id="xp-dia" value="${c.xp.bonusDiaCompleto}"></label>
+      </div>
+      <div class="dupla">
+        <label class="campo"><span>Semana na meta</span><input type="number" id="xp-semana" value="${c.xp.bonusSemanaMeta}"></label>
+        <label class="campo"><span>Semana perfeita</span><input type="number" id="xp-perfeita" value="${c.xp.bonusSemanaPerfeita}"></label>
+      </div>
+      <label class="campo"><span>Retomada após um dia fraco</span><input type="number" id="xp-retomada" value="${c.xp.bonusRetomada}"></label>
+      <button class="btn bloco" id="cfg-salvar-xp" style="margin-top:14px">Salvar XP</button>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Ciclos</h2></div>
+      ${dados.ciclos.map(x => `
+        <div class="item-lista ${x.id === dados.cicloAtivo ? '' : 'pausado'}">
+          <div class="emoji">${x.id === dados.cicloAtivo ? '🎯' : '📁'}</div>
+          <div class="info"><b>${esc(x.nome)}</b>
+            <span>${dataCurta(x.inicio)} — ${dataCurta(fimDoCiclo(x))} · ${x.semanas} semanas</span></div>
+          ${x.id === dados.cicloAtivo ? '<span class="rotulo">Ativo</span>' :
+            `<button class="btn pequeno" data-ativar-ciclo="${x.id}">Ativar</button>`}
+        </div>`).join('')}
+      <button class="btn bloco" id="btn-novo-ciclo" style="margin-top:12px">+ Criar próximo ciclo</button>
+      <p style="color:var(--cinza-2);font-size:.76rem;margin:12px 0 0;line-height:1.5">
+        O novo ciclo herda hábitos, agenda e regras do ciclo atual — e o histórico dos anteriores continua disponível.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo"><h2>Dados</h2></div>
+      <button class="btn bloco" id="btn-exportar">Exportar cópia (.json)</button>
+      <button class="btn bloco" id="btn-importar" style="margin-top:9px">Importar cópia</button>
+      <input type="file" id="arquivo-importar" accept="application/json" class="oculto">
+      <button class="btn bloco perigo" id="btn-zerar" style="margin-top:9px">Apagar tudo e recomeçar</button>
+      <p style="color:var(--cinza-2);font-size:.76rem;margin:12px 0 0;line-height:1.5">
+        Tudo fica salvo apenas neste dispositivo, sem servidor e sem conta. Exporte de vez em quando.</p>
+    </div>
+  `;
+  ligarEventosAjustes(c);
+  atualizarTopo();
+};
+
+function rotuloTipo(h){
+  if(h.tipo === 'quantidade') return `Meta ${fmtNum(h.meta)} ${h.unidade}`;
+  if(h.tipo === 'sono') return 'Sono (progressivo)';
+  return 'Check diário';
+}
+
+function ligarEventosAjustes(c){
+  const $ = id => document.getElementById(id);
+
+  $('cfg-salvar-ciclo').addEventListener('click', () => {
+    c.nome = $('cfg-nome').value.trim() || c.nome;
+    c.objetivo = $('cfg-objetivo').value.trim();
+    c.inicio = $('cfg-inicio').value || c.inicio;
+    c.semanas = Math.max(1, Math.min(52, Number($('cfg-semanas').value) || c.semanas));
+    c.metaConsistencia = Math.max(1, Math.min(100, Number($('cfg-meta').value) || c.metaConsistencia));
+    while(c.metasSono.length < c.semanas) c.metasSono.push(c.metasSono[c.metasSono.length-1] || '00:00');
+    semanaVista = null;
+    salvar(); avisar('Ciclo atualizado.', true); RENDERIZADORES.ajustes();
+  });
+
+  $('btn-novo-habito').addEventListener('click', () => abrirHabito(null));
+  document.querySelectorAll('[data-edit-habito]').forEach(b =>
+    b.addEventListener('click', () => abrirHabito(b.dataset.editHabito)));
+
+  document.querySelectorAll('[data-agenda]').forEach(s => s.addEventListener('change', () => {
+    c.agenda[Number(s.dataset.agenda)] = {tipo: s.value};
+    salvar(); avisar('Agenda atualizada.');
+  }));
+
+  $('cfg-salvar-sono').addEventListener('click', () => {
+    const metas = [];
+    document.querySelectorAll('[data-sono-semana]').forEach(i => metas.push(i.value || '00:00'));
+    c.metasSono = metas;
+    c.toleranciaSono = Math.max(0, Number($('cfg-tolerancia').value) || 0);
+    salvar(); avisar('Metas de sono salvas.', true);
+  });
+
+  const chave = $('chave-pesagem');
+  const alternar = () => {
+    c.pesagem.ativa = !c.pesagem.ativa;
+    chave.classList.toggle('on', c.pesagem.ativa);
+    chave.setAttribute('aria-checked', c.pesagem.ativa);
+    salvar();
+  };
+  chave.addEventListener('click', alternar);
+  chave.addEventListener('keydown', e => { if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); alternar(); } });
+
+  $('cfg-salvar-peso').addEventListener('click', () => {
+    c.pesagem.diaSemana = Number($('cfg-dia-pesagem').value);
+    c.medidas = $('cfg-medidas').value.split(',').map(s => s.trim()).filter(Boolean);
+    salvar(); avisar('Preferências salvas.', true);
+  });
+
+  $('cfg-salvar-xp').addEventListener('click', () => {
+    c.xp.atividade = Number($('xp-atividade').value) || 0;
+    c.xp.bonusDiaCompleto = Number($('xp-dia').value) || 0;
+    c.xp.bonusSemanaMeta = Number($('xp-semana').value) || 0;
+    c.xp.bonusSemanaPerfeita = Number($('xp-perfeita').value) || 0;
+    c.xp.bonusRetomada = Number($('xp-retomada').value) || 0;
+    salvar(); avisar('Regras de XP salvas.', true); atualizarTopo();
+  });
+
+  document.querySelectorAll('[data-ativar-ciclo]').forEach(b => b.addEventListener('click', () => {
+    dados.cicloAtivo = b.dataset.ativarCiclo;
+    semanaVista = null;
+    salvar(); avisar('Ciclo ativado.', true); RENDERIZADORES.ajustes();
+  }));
+
+  $('btn-novo-ciclo').addEventListener('click', () => criarProximoCiclo(c));
+
+  $('btn-exportar').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `consistencia-${hoje()}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  $('btn-importar').addEventListener('click', () => $('arquivo-importar').click());
+  $('arquivo-importar').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if(!f) return;
+    const leitor = new FileReader();
+    leitor.onload = () => {
+      try{
+        const novo = JSON.parse(leitor.result);
+        if(!novo.ciclos) throw new Error('formato');
+        dados = novo;
+        dados.registros = dados.registros || {};
+        dados.pesagens = dados.pesagens || [];
+        dados.medidas = dados.medidas || [];
+        semanaVista = null;
+        salvar(); avisar('Cópia importada.', true); irPara('hoje');
+      }catch(err){ avisar('Arquivo não reconhecido.'); }
+    };
+    leitor.readAsText(f);
+    e.target.value = '';
+  });
+
+  $('btn-zerar').addEventListener('click', () => {
+    abrirFolha('Apagar tudo?', 'Isso remove ciclos, registros, pesagens e medidas deste dispositivo.', `
+      <div class="folha-acoes">
+        <button class="btn" data-fechar>Cancelar</button>
+        <button class="btn perigo" id="confirmar-zerar">Apagar</button>
+      </div>`, () => {
+      document.getElementById('confirmar-zerar').addEventListener('click', () => {
+        localStorage.removeItem(CHAVE);
+        dados = dadosPadrao();
+        semanaVista = null;
+        salvar(); fecharFolha(); avisar('Tudo recomeçado.'); irPara('hoje');
+      });
+    });
+  });
+}
+
+function criarProximoCiclo(c){
+  const novo = JSON.parse(JSON.stringify(c));
+  const n = dados.ciclos.length + 1;
+  novo.id = 'ciclo-' + n + '-' + Date.now().toString(36);
+  novo.nome = `Ciclo ${n}`;
+  novo.inicio = somaDias(fimDoCiclo(c), 1);
+  novo.excecoes = {};
+  dados.ciclos.push(novo);
+  dados.cicloAtivo = novo.id;
+  semanaVista = null;
+  salvar();
+  avisar('Novo ciclo criado a partir do atual.', true);
+  RENDERIZADORES.ajustes();
+}
+
+/* =========================================================================
+   14. Folhas (modais)
+   ========================================================================= */
+function abrirFolha(titulo, sub, corpo, aoAbrir){
+  const f = document.getElementById('folha');
+  document.getElementById('folha-corpo').innerHTML =
+    `<h3>${esc(titulo)}</h3>${sub ? `<p class="sub">${esc(sub)}</p>` : ''}${corpo}`;
+  document.getElementById('veu').classList.add('aberto');
+  f.classList.add('aberta');
+  f.scrollTop = 0;
+  f.querySelectorAll('[data-fechar]').forEach(b => b.addEventListener('click', fecharFolha));
+  if(aoAbrir) aoAbrir();
+}
+function fecharFolha(){
+  document.getElementById('folha').classList.remove('aberta');
+  document.getElementById('veu').classList.remove('aberto');
+}
+document.getElementById('veu').addEventListener('click', fecharFolha);
+document.addEventListener('keydown', e => { if(e.key === 'Escape') fecharFolha(); });
+
+/* --- Registro de sono --- */
+function abrirSono(data){
+  const c = ciclo();
+  const h = c.habitos.find(x => x.tipo === 'sono');
+  const atual = registro(data).habitos[h.id] || {};
+  const meta = metaSono(data, c);
+  abrirFolha('Sono', `${dataLonga(data)}${meta ? ` · meta: na cama até ${meta}` : ''}`, `
+    <div class="dupla">
+      <label class="campo"><span>Fui para a cama às</span>
+        <input type="time" id="sono-deitar" value="${atual.deitar || meta || '00:30'}"></label>
+      <label class="campo"><span>Horas dormidas</span>
+        <input type="number" id="sono-horas" step="0.25" min="0" max="16" placeholder="opcional" value="${atual.horas || ''}"></label>
+    </div>
+    <div class="folha-acoes">
+      ${atual.deitar ? '<button class="btn perigo" id="sono-limpar">Limpar</button>' : '<button class="btn" data-fechar>Cancelar</button>'}
+      <button class="btn volt" id="sono-salvar">Salvar</button>
+    </div>`, () => {
+    document.getElementById('sono-salvar').addEventListener('click', () => {
+      const deitar = document.getElementById('sono-deitar').value;
+      if(!deitar){ avisar('Informe o horário.'); return; }
+      const horas = Number(document.getElementById('sono-horas').value) || null;
+      registro(data).habitos[h.id] = {deitar, horas};
+      salvar(); fecharFolha(); vibrar(14);
+      const a = avaliarHabito(h, data, c);
+      avisar(a.feito >= 1 ? `Meta de sono atingida · +${a.xp} XP` : a.feito > 0 ? `Perto da meta · +${a.xp} XP` : 'Sono registrado.', a.feito > 0);
+      RENDERIZADORES[abaAtual]();
+    });
+    const lim = document.getElementById('sono-limpar');
+    if(lim) lim.addEventListener('click', () => {
+      delete registro(data).habitos[h.id];
+      salvar(); fecharFolha(); RENDERIZADORES[abaAtual]();
+    });
+  });
+}
+
+/* --- Trocar a atividade de um dia (exceção pontual) --- */
+function abrirTrocaAtividade(data){
+  const c = ciclo();
+  const plano = atividadePlanejada(data, c);
+  const r = resumoDia(data, c);
+  const reg = registro(data);
+  abrirFolha(dataLonga(data), 'Vale só para este dia — a agenda da semana continua como está.', `
+    <label class="campo"><span>Atividade do dia</span>
+      <select id="troca-tipo">
+        ${Object.entries(TIPOS_ATIVIDADE).filter(([k]) => k !== 'custom').map(([k,v]) =>
+          `<option value="${k}" ${plano.tipo === k ? 'selected' : ''}>${v.emoji} ${v.nome}</option>`).join('')}
+        <option value="custom" ${plano.tipo === 'custom' ? 'selected' : ''}>⭐ Personalizada</option>
+      </select></label>
+    <label class="campo" id="campo-custom" style="${plano.tipo === 'custom' ? '' : 'display:none'}">
+      <span>Nome da atividade</span>
+      <input type="text" id="troca-nome" value="${esc(plano.tipo === 'custom' ? plano.nome : '')}" placeholder="Ex.: natação"></label>
+    ${plano.exige ? `
+      <div class="interruptor" style="margin-top:6px">
+        <span style="font-weight:600">Marcar como realizada</span>
+        <div class="chave ${reg.atividade && reg.atividade.feita ? 'on' : ''}" id="chave-feita" role="switch" tabindex="0"></div>
+      </div>` : `<p class="sub" style="margin-top:12px">Recuperação e descanso já contam como cumpridos.</p>`}
+    <div class="folha-acoes">
+      ${plano.excecao ? '<button class="btn" id="voltar-agenda">Voltar à agenda</button>' : '<button class="btn" data-fechar>Cancelar</button>'}
+      <button class="btn volt" id="troca-salvar">Salvar</button>
+    </div>
+    <p class="sub" style="margin:14px 0 0;text-align:center">Progresso do dia: ${pct(r.percent)}</p>`, () => {
+    const sel = document.getElementById('troca-tipo');
+    sel.addEventListener('change', () => {
+      document.getElementById('campo-custom').style.display = sel.value === 'custom' ? '' : 'none';
+    });
+    let feita = !!(reg.atividade && reg.atividade.feita);
+    const chave = document.getElementById('chave-feita');
+    if(chave){
+      const alt = () => { feita = !feita; chave.classList.toggle('on', feita); };
+      chave.addEventListener('click', alt);
+      chave.addEventListener('keydown', e => { if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); alt(); } });
+    }
+    document.getElementById('troca-salvar').addEventListener('click', () => {
+      const tipo = sel.value;
+      if(tipo === 'custom'){
+        const nome = document.getElementById('troca-nome').value.trim() || 'Atividade';
+        c.excecoes[data] = {tipo:'custom', nome, emoji:'⭐', exige:true};
+      } else {
+        c.excecoes[data] = {tipo};
+      }
+      const novoPlano = atividadePlanejada(data, c);
+      reg.atividade = novoPlano.exige ? {feita, tipo:novoPlano.tipo} : null;
+      salvar(); fecharFolha(); avisar('Dia ajustado.', true);
+      RENDERIZADORES[abaAtual]();
+    });
+    const voltar = document.getElementById('voltar-agenda');
+    if(voltar) voltar.addEventListener('click', () => {
+      delete c.excecoes[data];
+      salvar(); fecharFolha(); avisar('Dia voltou para a agenda padrão.');
+      RENDERIZADORES[abaAtual]();
+    });
+  });
+}
+
+/* --- Atividade adicional em dia de recuperação --- */
+function abrirExtra(data){
+  abrirFolha('Atividade adicional', 'Registrada como extra — não muda o plano do dia.', `
+    <label class="campo"><span>O que você fez?</span>
+      <input type="text" id="extra-nome" placeholder="Ex.: treino leve em casa"></label>
+    <div class="folha-acoes">
+      <button class="btn" data-fechar>Cancelar</button>
+      <button class="btn volt" id="extra-salvar">Registrar</button>
+    </div>`, () => {
+    const campo = document.getElementById('extra-nome');
+    campo.focus();
+    document.getElementById('extra-salvar').addEventListener('click', () => {
+      const nome = campo.value.trim();
+      if(!nome){ avisar('Descreva a atividade.'); return; }
+      registro(data).extras.push({nome, emoji:'⭐'});
+      salvar(); fecharFolha(); vibrar(12); avisar('Movimento registrado.', true);
+      RENDERIZADORES[abaAtual]();
+    });
+  });
+}
+
+/* --- Criar / editar hábito --- */
+const EMOJIS = ['🍽️','🍫','💊','💧','🌙','🥩','🏃','🧘','📖','☀️','🧴','🚭','🥗','🦵','🧊','⏱️'];
+
+function abrirHabito(id){
+  const c = ciclo();
+  const h = id ? c.habitos.find(x => x.id === id) : null;
+  const novo = !h;
+  const atual = h || {nome:'', emoji:'⭐', tipo:'check', detalhe:'', meta:1, unidade:'', passo:1, xp:10, ativo:true};
+
+  abrirFolha(novo ? 'Novo hábito' : 'Editar hábito', novo ? 'Ele passa a aparecer todos os dias.' : '', `
+    <label class="campo"><span>Nome</span>
+      <input type="text" id="h-nome" value="${esc(atual.nome)}" placeholder="Ex.: Proteína"></label>
+    <label class="campo"><span>Ícone</span>
+      <input type="text" id="h-emoji" value="${esc(atual.emoji)}" maxlength="4" style="width:80px;text-align:center;font-size:1.3rem"></label>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+      ${EMOJIS.map(e => `<button class="btn pequeno" data-emoji="${e}" style="font-size:1.1rem;padding:6px 9px">${e}</button>`).join('')}
+    </div>
+    <label class="campo"><span>Descrição curta</span>
+      <input type="text" id="h-detalhe" value="${esc(atual.detalhe || '')}" placeholder="opcional"></label>
+    <label class="campo"><span>Tipo de registro</span>
+      <select id="h-tipo" ${atual.tipo === 'sono' ? 'disabled' : ''}>
+        <option value="check" ${atual.tipo === 'check' ? 'selected' : ''}>Check simples</option>
+        <option value="quantidade" ${atual.tipo === 'quantidade' ? 'selected' : ''}>Quantidade com meta</option>
+        ${atual.tipo === 'sono' ? '<option value="sono" selected>Sono (progressivo)</option>' : ''}
+      </select></label>
+    <div id="bloco-qtd" style="${atual.tipo === 'quantidade' ? '' : 'display:none'}">
+      <div class="dupla">
+        <label class="campo"><span>Meta</span>
+          <input type="number" id="h-meta" step="0.25" value="${atual.meta ?? 1}"></label>
+        <label class="campo"><span>Unidade</span>
+          <input type="text" id="h-unidade" value="${esc(atual.unidade || '')}" placeholder="L, g, min"></label>
+      </div>
+      <label class="campo"><span>Passo do botão + / −</span>
+        <input type="number" id="h-passo" step="0.25" min="0.05" value="${atual.passo ?? 1}"></label>
+    </div>
+    <label class="campo"><span>XP por conclusão</span>
+      <input type="number" id="h-xp" min="0" value="${atual.xp}"></label>
+    <div class="interruptor" style="margin-top:6px">
+      <span style="font-weight:600">Ativo neste ciclo</span>
+      <div class="chave ${atual.ativo ? 'on' : ''}" id="h-ativo" role="switch" tabindex="0"></div>
+    </div>
+    <div class="folha-acoes">
+      ${novo ? '<button class="btn" data-fechar>Cancelar</button>'
+             : '<button class="btn perigo" id="h-excluir">Excluir</button>'}
+      <button class="btn volt" id="h-salvar">Salvar</button>
+    </div>`, () => {
+    const $ = i => document.getElementById(i);
+    const tipo = $('h-tipo');
+    tipo.addEventListener('change', () => {
+      $('bloco-qtd').style.display = tipo.value === 'quantidade' ? '' : 'none';
+    });
+    document.querySelectorAll('[data-emoji]').forEach(b =>
+      b.addEventListener('click', () => { $('h-emoji').value = b.dataset.emoji; }));
+
+    let ativo = atual.ativo;
+    const chave = $('h-ativo');
+    const alt = () => { ativo = !ativo; chave.classList.toggle('on', ativo); };
+    chave.addEventListener('click', alt);
+    chave.addEventListener('keydown', e => { if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); alt(); } });
+
+    $('h-salvar').addEventListener('click', () => {
+      const nome = $('h-nome').value.trim();
+      if(!nome){ avisar('Dê um nome ao hábito.'); return; }
+      const registroHabito = {
+        id: h ? h.id : 'h-' + Date.now().toString(36),
+        nome,
+        emoji: $('h-emoji').value.trim() || '⭐',
+        detalhe: $('h-detalhe').value.trim(),
+        tipo: h && h.tipo === 'sono' ? 'sono' : tipo.value,
+        meta: tipo.value === 'quantidade' ? Number($('h-meta').value) || 0 : (h ? h.meta : null),
+        unidade: tipo.value === 'quantidade' ? $('h-unidade').value.trim() : '',
+        passo: tipo.value === 'quantidade' ? (Number($('h-passo').value) || 1) : undefined,
+        xp: Math.max(0, Number($('h-xp').value) || 0),
+        ativo
+      };
+      if(h) Object.assign(h, registroHabito);
+      else c.habitos.push(registroHabito);
+      salvar(); fecharFolha(); avisar(novo ? 'Hábito criado.' : 'Hábito atualizado.', true);
+      RENDERIZADORES.ajustes();
+    });
+
+    const excluir = $('h-excluir');
+    if(excluir) excluir.addEventListener('click', () => {
+      c.habitos = c.habitos.filter(x => x.id !== h.id);
+      salvar(); fecharFolha(); avisar('Hábito removido.');
+      RENDERIZADORES.ajustes();
+    });
+  });
+}
+
+/* --- Pesagem --- */
+function abrirPesagem(){
+  const c = ciclo();
+  const ultima = dados.pesagens.slice().sort((a,b) => b.data.localeCompare(a.data))[0];
+  abrirFolha('Registrar pesagem', 'Mesmo dia, mesmo horário, condições parecidas.', `
+    <label class="campo"><span>Data</span><input type="date" id="p-data" value="${hoje()}"></label>
+    <div class="dupla">
+      <label class="campo"><span>Peso (kg)</span>
+        <input type="number" id="p-peso" step="0.1" inputmode="decimal"
+          value="${ultima ? ultima.peso : c.pesoReferencia}"></label>
+      <label class="campo"><span>Gordura (%)</span>
+        <input type="number" id="p-gordura" step="0.1" placeholder="opcional" value="${ultima && ultima.gordura ? ultima.gordura : ''}"></label>
+    </div>
+    <div class="folha-acoes">
+      <button class="btn" data-fechar>Cancelar</button>
+      <button class="btn volt" id="p-salvar">Salvar</button>
+    </div>
+    <p class="sub" style="margin:14px 0 0;text-align:center">A bioimpedância serve para a tendência, não como medida clínica.</p>`, () => {
+    document.getElementById('p-salvar').addEventListener('click', () => {
+      const data = document.getElementById('p-data').value || hoje();
+      const peso = Number(document.getElementById('p-peso').value);
+      if(!peso){ avisar('Informe o peso.'); return; }
+      const gordura = Number(document.getElementById('p-gordura').value) || null;
+      dados.pesagens = dados.pesagens.filter(p => p.data !== data);
+      dados.pesagens.push({data, peso, gordura});
+      salvar(); fecharFolha(); vibrar(14); avisar('Pesagem registrada.', true);
+      RENDERIZADORES.progresso();
+    });
+  });
+}
+
+/* --- Medidas --- */
+function abrirMedidas(){
+  const c = ciclo();
+  if(!c.medidas.length){ avisar('Defina as medidas em Ajustes.'); return; }
+  abrirFolha('Registrar medidas', 'Podem ter periodicidade diferente da pesagem.', `
+    <label class="campo"><span>Data</span><input type="date" id="m-data" value="${hoje()}"></label>
+    ${c.medidas.map((m,i) => `
+      <label class="campo"><span>${esc(m)} (cm)</span>
+        <input type="number" step="0.5" inputmode="decimal" data-medida="${i}" placeholder="opcional"></label>`).join('')}
+    <div class="folha-acoes">
+      <button class="btn" data-fechar>Cancelar</button>
+      <button class="btn volt" id="m-salvar">Salvar</button>
+    </div>`, () => {
+    document.getElementById('m-salvar').addEventListener('click', () => {
+      const data = document.getElementById('m-data').value || hoje();
+      const valores = {};
+      document.querySelectorAll('[data-medida]').forEach(i => {
+        const v = Number(i.value);
+        if(v) valores[c.medidas[Number(i.dataset.medida)]] = v;
+      });
+      if(!Object.keys(valores).length){ avisar('Preencha ao menos uma medida.'); return; }
+      dados.medidas = dados.medidas.filter(m => m.data !== data);
+      dados.medidas.push({data, valores});
+      salvar(); fecharFolha(); avisar('Medidas registradas.', true);
+      RENDERIZADORES.progresso();
+    });
+  });
+}
+
+/* --- Ver e editar um dia do histórico --- */
+function abrirDia(data){
+  const c = ciclo();
+  const r = resumoDia(data, c);
+  abrirFolha(dataLonga(data), `${pct(r.percent)} de consistência · ${Math.round(r.xp)} XP`, `
+    <div>${r.itens.map(i => `
+      <div class="habito ${i.aval.feito >= 1 ? 'feito' : i.aval.feito > 0 ? 'parcial' : ''}">
+        <div class="emoji">${i.habito.emoji}</div>
+        <div class="info"><b>${esc(i.habito.nome)}</b><span>${esc(i.aval.texto || '')}</span></div>
+        ${i.habito.tipo === 'check'
+          ? `<button class="marcador ${i.aval.feito ? 'feito' : ''}" data-dia-check="${i.habito.id}">
+               <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></button>`
+          : `<b style="font-size:.85rem;color:var(--cinza-2)">${i.aval.feito >= 1 ? '✓' : ''}</b>`}
+      </div>`).join('')}
+    </div>
+    ${r.atividade.plano.exige ? `
+      <div class="atividade ${r.atividade.marcada ? 'feita' : ''}" style="margin-top:10px">
+        <div class="emoji">${r.atividade.plano.emoji}</div>
+        <div class="txt"><b>${esc(r.atividade.plano.nome)}</b><span>Atividade programada</span></div>
+        <button class="marcador ${r.atividade.marcada ? 'feito' : ''}" id="dia-atividade">
+          <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></button>
+      </div>` : ''}
+    <div class="folha-acoes">
+      <button class="btn" data-fechar>Fechar</button>
+      <button class="btn volt" id="dia-editar">Ajustar atividade</button>
+    </div>
+    <p class="sub" style="margin:14px 0 0;text-align:center;line-height:1.5">
+      Registrar um dia esquecido é sempre melhor do que deixar em branco.</p>`, () => {
+    document.querySelectorAll('[data-dia-check]').forEach(b => b.addEventListener('click', () => {
+      const id = b.dataset.diaCheck;
+      const reg = registro(data);
+      reg.habitos[id] = !reg.habitos[id];
+      salvar(); vibrar(10);
+      abrirDia(data);
+      RENDERIZADORES[abaAtual]();
+    }));
+    const at = document.getElementById('dia-atividade');
+    if(at) at.addEventListener('click', () => {
+      const reg = registro(data);
+      const plano = atividadePlanejada(data, c);
+      reg.atividade = {feita: !(reg.atividade && reg.atividade.feita), tipo:plano.tipo};
+      salvar(); vibrar(12);
+      abrirDia(data);
+      RENDERIZADORES[abaAtual]();
+    });
+    document.getElementById('dia-editar').addEventListener('click', () => abrirTrocaAtividade(data));
+  });
+}
+
+/* =========================================================================
+   15. Início
+   ========================================================================= */
+irPara('hoje');
+
+/* O dia pode virar com o app aberto. */
+let diaCorrente = hoje();
+setInterval(() => {
+  if(hoje() !== diaCorrente){ diaCorrente = hoje(); semanaVista = null; RENDERIZADORES[abaAtual](); }
+}, 60000);
+document.addEventListener('visibilitychange', () => {
+  if(!document.hidden && hoje() !== diaCorrente){ diaCorrente = hoje(); semanaVista = null; RENDERIZADORES[abaAtual](); }
+});
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>

@@ -1,15 +1,17 @@
-/* Service worker dos apps (Notas.Voz e Despesas)
+/* Service worker dos apps (Notas.Voz, Despesas e Consistência)
    Objetivo: as páginas abrirem e funcionarem sem internet (avião, roaming cortado, sinal ruim).
    Só toma conta dos arquivos dos apps e das fontes — qualquer outra página do site
    (inclusive a home do Kingston Running Team) passa direto, sem cache. */
 
-const CACHE = 'apps-v3';
+const CACHE = 'apps-v4';
 
 const ARQUIVOS = [
   './notas.html',
   './manifest.webmanifest',
   './despesas.html',
   './despesas.webmanifest',
+  './consistencia.html',
+  './consistencia.webmanifest',
   './icone-192.png',
   './icone-512.png'
 ];
@@ -68,7 +70,9 @@ self.addEventListener('fetch', evento => {
 
     // Offline e sem cópia guardada: cai para a página do app que estava sendo aberta.
     if (req.mode === 'navigate') {
-      const pagina = url.pathname.includes('despesas') ? './despesas.html' : './notas.html';
+      const pagina = url.pathname.includes('despesas')     ? './despesas.html'
+                   : url.pathname.includes('consistencia') ? './consistencia.html'
+                   : './notas.html';
       const reserva = await cache.match(new URL(pagina, self.location).pathname);
       if (reserva) return reserva;
     }
