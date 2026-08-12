@@ -148,21 +148,30 @@ no volume real de duplicatas.
 Implica: quarta resposta na interface do operador (Sprint 4) e as colunas `duplicate_flag` e
 `operator_decision` em `redemption`.
 
+**Limiar de sessões por slot: 25**, configurável por estação e alterável durante o evento
+(arquitetura §3.6). Dispara apenas um alerta operacional no dashboard — não recusa check-in nem
+afeta resgate.
+
+Razão: uma fila cheia produz de 5 a 15 sessões no mesmo slot e um código vazado produz centenas,
+então qualquer limiar entre 15 e 40 detecta os mesmos eventos. A configurabilidade por estação
+cobre a diferença entre uma TV num corredor e um tablet num balcão.
+
+Revisão programada: após o primeiro dia do piloto, trocar por regra proporcional — acima de 8× a
+mediana de ocupação de slot daquela estação.
+
 ### 4.2 Pendente
 
-Nenhum destes bloqueia o Sprint 1. O primeiro bloqueia o Sprint 4:
+Nenhum destes bloqueia os Sprints 1 a 4:
 
-1. **Limiar de sessões por slot** que dispara suspeita de vazamento de estação. Recomendação: 25,
-   calibrando depois do primeiro dia do piloto.
-2. **Comportamento na falha de envio de lead** — perder ou reter (arquitetura §6). Reter contraria §9.1.
-3. **Provedor de nuvem**, que é o que permite trocar a ordem de grandeza de custo por um número
+1. **Comportamento na falha de envio de lead** — perder ou reter (arquitetura §6). Reter contraria §9.1.
+2. **Provedor de nuvem**, que é o que permite trocar a ordem de grandeza de custo por um número
    defensável.
-4. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura do QR.
-5. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
+3. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura do QR.
+4. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
    API, banco nem cofre de chaves. Sugestão: documentação permanece aqui, código vai para um
    monorepo novo com os três PWAs, a API e a biblioteca criptográfica compartilhada — sendo o
    compartilhamento dessa biblioteca a garantia de que emissor e verificador usam o mesmo código.
-6. **Dados do piloto KaBuM!** — número de estações, duração, pontos de retirada, brindes,
+5. **Dados do piloto KaBuM!** — número de estações, duração, pontos de retirada, brindes,
    operadores, dispositivos de estação e se haverá captação de lead.
 
 ---

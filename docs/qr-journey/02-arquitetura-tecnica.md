@@ -227,9 +227,31 @@ Ambas as saídas são registradas — `redemption.duplicate_flag` e a escolha do
 para que o analytics mostre o volume real de duplicatas e permita endurecer a política em
 eventos futuros com base em dado, não em suposição.
 
-Complementarmente, no sync, um `(station, slot)` reivindicado por um número
-anômalo de sessões distintas (padrão: > 25) é sinalizado no analytics como suspeita de
-vazamento daquela estação. Isso entrega o "antifraude moderado" de §39 sem custo de latência
+Complementarmente, no sync, um `(station, slot)` reivindicado por um número anômalo de sessões
+distintas é sinalizado no analytics como suspeita de vazamento daquela estação. **Decidido para
+o piloto: limiar de 25 sessões distintas por slot**, configurável por estação e alterável
+durante o evento.
+
+O limiar é apenas um alerta operacional — não recusa check-in, não bloqueia jornada, não afeta
+resgate:
+
+```text
+⚠  Estação 7 · 14h32
+   312 sessões usaram o mesmo slot de 15 segundos.
+   Provável vazamento — verificar a estação.
+```
+
+O valor exato é pouco sensível porque as duas distribuições não se sobrepõem: uma fila cheia
+produz de 5 a 15 sessões por slot, e um código distribuído por mensageria produz centenas.
+Qualquer limiar entre 15 e 40 detecta os mesmos eventos. A configurabilidade por estação
+importa porque uma TV grande num corredor tem pico legítimo muito maior que um tablet num
+balcão.
+
+**Após o primeiro dia do piloto**, substituir a regra absoluta por uma proporcional — sugestão:
+acima de 8× a mediana de ocupação de slot daquela estação — que se autoajusta a cada tipo de
+estação em vez de impor um número único a todas.
+
+Juntos, o fingerprint e o limiar entregam o "antifraude moderado" de §39 sem custo de latência
 no caminho crítico.
 
 ### 3.7 Relógio
@@ -373,7 +395,7 @@ precisão antes disso.
 | # | Questão | Impacto | Encaminhamento sugerido |
 | --- | --- | --- | --- |
 | Q1 | Vazamento de `K_station` de um dispositivo de estação com acesso ao console | Permite cunhar tokens infinitos daquela estação | Aceitável para "moderado" (§39): dispositivos são supervisionados. Endurecimento futuro: lote de tokens pré-assinados, sem segredo de cunhagem no dispositivo. |
-| Q2 | Compartilhamento em massa de tokens | Resgates indevidos | Fingerprint de caminhada + detector de slot anômalo (§3.6). Decidir a política padrão com o cliente. |
+| Q2 | Compartilhamento em massa de tokens | Resgates indevidos | **Resolvido no desenho** (§3.6): fingerprint de caminhada em modo `avisar` + alerta de slot anômalo em 25 sessões. Reavaliar o limiar após o dia 1. |
 | Q3 | Limpeza de dados do navegador perde a jornada | Frustração do visitante | Já previsto em §8; garantir que o aviso no welcome seja explícito. Sem solução sem cadastro. |
 | Q4 | iOS sem Background Sync | Sync atrasa | Retry no `online` + sync forçado ao abrir o app. Não afeta o resgate, que carrega a prova. |
 | Q5 | Jornadas acima de ~60 estações | QR de resgate denso demais | Fora do MVP. Se surgir, exigir sync antes do resgate para esses eventos. |
