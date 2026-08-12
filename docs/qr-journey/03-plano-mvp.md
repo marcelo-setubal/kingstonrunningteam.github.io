@@ -184,7 +184,11 @@ Implica: texto de política no contrato e no formulário de briefing (Sprint 6).
 
 Nenhum destes bloqueia os Sprints 1 a 4:
 
-1. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura do QR.
+1. **Domínio curto** para a URL das estações — cada caractere economizado vira alcance de leitura
+   do QR. Previsto para registro na sexta-feira; não bloqueia nada. Desenvolvimento e teste de
+   campo usam o subdomínio gratuito `*.pages.dev`, que produz um QR perfeitamente escaneável
+   (~54 caracteres, versão 5). O prefixo da URL é **configuração por evento, nunca literal no
+   código** — trocar o domínio depois é mudar um valor, não reconstruir nada.
 2. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
    API, banco nem cofre de chaves. Sugestão: documentação permanece aqui, código vai para um
    monorepo novo com os três PWAs, a API e a biblioteca criptográfica compartilhada — sendo o
