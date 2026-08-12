@@ -118,9 +118,10 @@ Três decisões dentro dessa linha:
   modo byte cru sofre em scanners web. É a mesma escolha do certificado COVID europeu, pelo
   mesmo motivo.
 - **QR pequeno importa.** ~30×30 módulos escaneia à distância e em ângulo ruim; um QR dessa
-  ordem é lido em fração de segundo, e é isso que torna a janela de 15 s praticável. Vale
-  contratar um domínio curto só para essa URL: cada caractere economizado aqui vira alcance de
-  leitura.
+  ordem é lido em fração de segundo, e é isso que torna a janela de 15 s praticável. Convém um
+  domínio curto para essa URL — mas o ganho é modesto e não justifica prêmio de mercado: entre
+  41 e 54 caracteres de URL a diferença é de uma única versão de QR (29×29 contra 33×33), e o
+  subdomínio gratuito da plataforma, com nome de projeto enxuto, empata com um domínio pago.
 
 Custo de CPU: um HMAC a cada 15 s. Web Crypto faz isso nativamente. Um tablet de entrada roda
 isso por dias.
