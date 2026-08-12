@@ -31,10 +31,17 @@ Biblioteca isolada, com testes, sem nenhuma tela.
 - Verificação server-side: tag, janela do evento, cobertura de estações obrigatórias
 - `walk_fingerprint`
 - Testes de propriedade obrigatórios: **tag forjado rejeitado; tag de outra estação rejeitado;
-  tag de outro evento rejeitado; slot fora da janela rejeitado; cobertura incompleta rejeitada;
-  segundo resgate da mesma sessão rejeitado sob concorrência**
+  tag de outro evento rejeitado; slot fora da janela rejeitado; cobertura incompleta rejeitada**
 
 *Critérios cobertos:* base para 5, 13, 14, 15.
+
+**Concluído** — `packages/core`, 28 testes passando, zero dependências externas. Confirmou os
+números da arquitetura: jornada de 20 estações em 241 bytes e 362 caracteres, URL de estação em
+47 caracteres.
+
+Correção de escopo: o teste "segundo resgate da mesma sessão rejeitado sob concorrência" não
+pertence a este sprint. Ele depende da restrição de unicidade no banco, não da biblioteca, e
+passa para o Sprint 4.
 
 ### Sprint 2 — App da estação
 
@@ -67,6 +74,8 @@ Biblioteca isolada, com testes, sem nenhuma tela.
 - As três respostas de §21 + o aviso de duplicata
 - Registro do brinde entregue, com operador, ponto, data e hora
 - Uso único garantido por unique constraint
+- Teste de concorrência: **segundo resgate da mesma sessão rejeitado sob requisições simultâneas**
+  (movido do Sprint 1 — depende do banco, não da biblioteca)
 
 *Critérios cobertos:* 14, 15, 16, 17.
 
@@ -180,6 +189,12 @@ superfície de risco do cliente.
 
 Implica: texto de política no contrato e no formulário de briefing (Sprint 6).
 
+**Repositório de implementação: [`marcelo-setubal/QRJourney`](https://github.com/marcelo-setubal/QRJourney)**,
+monorepo privado. A documentação permanece neste repositório; o código vai para lá. A biblioteca
+criptográfica é compartilhada entre estação, visitante e verificador, e esse compartilhamento é a
+garantia de que emissor e verificador usam o mesmo código, não duas implementações que divergem
+em silêncio.
+
 ### 4.2 Pendente
 
 Nenhum destes bloqueia os Sprints 1 a 4:
@@ -201,12 +216,7 @@ Nenhum destes bloqueia os Sprints 1 a 4:
 
    O prefixo da URL é **configuração por evento, nunca literal no código** — trocar o domínio
    depois é mudar um valor, não reconstruir nada.
-2. **Repositório de implementação.** Este repo é um site estático no GitHub Pages e não comporta
-   API, banco nem cofre de chaves. Sugestão: documentação permanece aqui, código vai para um
-   monorepo novo com os três PWAs, a API e a biblioteca criptográfica compartilhada — sendo o
-   compartilhamento dessa biblioteca a garantia de que emissor e verificador usam o mesmo código.
-   Único item que precisa de resposta antes de escrever a primeira linha de código.
-3. **Dados do piloto KaBuM!** — número de estações, duração, pontos de retirada, brindes,
+2. **Dados do piloto KaBuM!** — número de estações, duração, pontos de retirada, brindes,
    operadores, dispositivos de estação e se haverá captação de lead.
 
 ---
